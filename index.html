@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dashboard Verifikasi Komitmen</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Modern Glassmorphism & Glossy UI */
+        body {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            min-height: 100vh;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+        }
+        
+        .table-container::-webkit-scrollbar { height: 8px; }
+        .table-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px;}
+        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        th, td { white-space: nowrap; font-family: 'Courier New', Courier, monospace; }
+        
+        .office-table { border: 2px solid #000; }
+        .office-table th, .office-table td { border: 1px solid #000 !important; color: #000 !important; padding: 6px 8px !important; font-size: 11px; }
+        .office-table thead th { background-color: #f3f4f6 !important; font-weight: bold; text-align: center; vertical-align: middle; }
+        .preview-card { max-width: 100%; overflow: hidden; }
+
+        @media (max-width: 768px) {
+            .preview-card { padding: 1rem; }
+            h3 { font-size: 1.25rem; }
+        }
+    </style>
+</head>
+<body class="text-gray-900 font-sans">
+
+    <nav class="glass-panel sticky top-0 z-40 border-b border-white/50">
+        <div class="max-w-full mx-auto px-4 md:px-6">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3 bg-gradient-to-r from-purple-700 to-indigo-700 text-transparent bg-clip-text">
+                    <i data-lucide="printer" class="w-6 h-6 text-indigo-700"></i>
+                    <span class="font-black text-lg md:text-2xl tracking-tighter uppercase">E-Verifikasi 3D</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-full mx-auto px-4 md:px-6 py-6 md:py-8">
+        
+        <div class="glass-panel rounded-2xl p-5 md:p-8 mb-8 no-print transition-all hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)]">
+            <h2 class="text-xl font-black mb-6 text-indigo-900 flex items-center gap-2 uppercase border-b-2 border-indigo-200 pb-3">
+                <i data-lucide="file-up" class="w-6 h-6"></i>
+                Input Data Laporan
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="md:col-span-2">
+                    <label class="relative flex flex-col items-center justify-center w-full h-36 md:h-44 border-2 border-indigo-400 border-dashed rounded-xl cursor-pointer bg-white/40 hover:bg-white/60 transition-all group shadow-inner">
+                        <div class="flex flex-col items-center justify-center pt-5 pb-6 transform group-hover:scale-105 transition-transform">
+                            <i data-lucide="upload-cloud" class="w-10 h-10 md:w-12 md:h-12 mb-3 text-indigo-600 drop-shadow-md"></i>
+                            <p class="mb-1 text-sm md:text-base text-indigo-900 font-black uppercase text-center px-2 tracking-wide">Pilih File CSV / Excel</p>
+                            <p class="text-[11px] text-indigo-600 font-semibold uppercase mt-1">Dukung Multi-Bulan & Multi-File</p>
+                        </div>
+                        <input type="file" id="fileInput" class="hidden" accept=".csv, .xlsx, .xls" multiple>
+                    </label>
+                </div>
+                
+                <div class="bg-white/50 p-5 rounded-xl border border-white shadow-sm">
+                    <h3 class="font-black text-sm mb-3 uppercase border-b border-indigo-200 pb-2 text-indigo-900">Blueprint Sistem Aktif:</h3>
+                    <ul class="space-y-2 text-[11px] md:text-xs text-gray-800 font-medium leading-relaxed">
+                        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Mendukung Excel (.xlsx) & CSV.</span></li>
+                        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Export F4 & Anti-Orphan TTD.</span></li>
+                        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Koneksi Database Bebas Multi-Login.</span></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div id="fileList" class="mt-5 flex flex-wrap gap-2 hidden"></div>
+            
+            <div class="mt-6 flex gap-3 hidden" id="actionButtons">
+                <button id="processBtn" class="w-full px-4 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-black rounded-xl shadow-[0_10px_20px_rgba(79,70,229,0.3)] transition-all flex justify-center items-center gap-2 uppercase tracking-widest text-sm transform hover:-translate-y-1">
+                    <i data-lucide="cpu" class="w-5 h-5"></i>
+                    Proses Laporan Otomatis
+                </button>
+            </div>
+        </div>
+
+        <div id="globalActionContainer" class="mb-8 hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <button onclick="downloadAllIndividualPDFs()" class="glass-panel w-full px-4 py-4 !bg-red-500/10 hover:!bg-red-500/20 !border-red-500/30 text-red-700 font-black rounded-xl shadow-lg flex items-center justify-center gap-2 uppercase tracking-tighter text-xs transition-all">
+                <i data-lucide="download" class="w-4 h-4"></i> PDF Terpisah
+            </button>
+            <button onclick="downloadAllMergedPDF()" class="w-full px-4 py-4 bg-gradient-to-r from-red-700 to-red-600 hover:from-red-800 hover:to-red-700 text-white font-black rounded-xl shadow-[0_8px_15px_rgba(220,38,38,0.3)] flex items-center justify-center gap-2 uppercase tracking-tighter text-xs transition-all transform hover:-translate-y-1">
+                <i data-lucide="file-text" class="w-4 h-4"></i> Cetak Semua (1 PDF)
+            </button>
+            <button onclick="downloadAllIndividualExcels()" class="glass-panel w-full px-4 py-4 !bg-emerald-500/10 hover:!bg-emerald-500/20 !border-emerald-500/30 text-emerald-700 font-black rounded-xl shadow-lg flex items-center justify-center gap-2 uppercase tracking-tighter text-xs transition-all">
+                <i data-lucide="sheet" class="w-4 h-4"></i> Excel Terpisah
+            </button>
+            <button onclick="downloadMergedExcel()" class="w-full px-4 py-4 bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-700 hover:to-green-600 text-white font-black rounded-xl shadow-[0_8px_15px_rgba(5,150,105,0.3)] flex items-center justify-center gap-2 uppercase tracking-tighter text-xs transition-all transform hover:-translate-y-1">
+                <i data-lucide="book" class="w-4 h-4"></i> Cetak Semua (1 Excel)
+            </button>
+        </div>
+
+        <div id="resultContainer" class="space-y-12"></div>
+    </main>
+
+    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 transition-all duration-500 opacity-0 bg-gray-900/90 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-4 z-50 pointer-events-none text-xs border border-white/10">
+        <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
+        <span id="toastMsg" class="font-bold uppercase tracking-widest">Pesan</span>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        
+        // --- MASUKKAN URL WEB APP GAS DI SINI ---
+        const GAS_WEBAPP_URL = "https://script.google.com/macros/s/ID_WEB_APP_ANDA/exec"; 
+
+        let processedDatasets = [];
+        let rawDataForDB = []; 
+
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        const actionButtons = document.getElementById('actionButtons');
+        const processBtn = document.getElementById('processBtn');
+        const resultContainer = document.getElementById('resultContainer');
+        const globalActionContainer = document.getElementById('globalActionContainer');
+
+        fileInput.addEventListener('change', (e) => {
+            fileList.innerHTML = '';
+            const files = e.target.files;
+            if (files.length > 0) {
+                fileList.classList.remove('hidden');
+                actionButtons.classList.remove('hidden');
+                Array.from(files).forEach(file => {
+                    const badge = document.createElement('span');
+                    badge.className = "px-3 py-1 bg-white/70 backdrop-blur-sm border border-indigo-200 text-indigo-900 rounded-full text-[10px] font-bold uppercase shadow-sm";
+                    badge.innerText = file.name;
+                    fileList.appendChild(badge);
+                });
+                lucide.createIcons();
+            }
+        });
+
+        processBtn.addEventListener('click', async () => {
+            const files = fileInput.files;
+            if (files.length === 0) return;
+
+            showToast("Memulai Proses Laporan...");
+            resultContainer.innerHTML = '';
+            processedDatasets = [];
+            rawDataForDB = [];
+            processBtn.disabled = true;
+            processBtn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Memproses...`;
+            lucide.createIcons();
+
+            for (let i = 0; i < files.length; i++) {
+                let text = "";
+                const file = files[i];
+                
+                // LOGIKA ADAPTOR: Jika Excel, baca lewat SheetJS lalu ubah ke string CSV (Pemisah ;)
+                if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                    const buffer = await file.arrayBuffer();
+                    const workbook = XLSX.read(buffer, { type: 'array' });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    text = XLSX.utils.sheet_to_csv(firstSheet, { FS: ";" }); // Ubah ke format CSV yang dikenali sistem lama
+                } else {
+                    // Jika memang CSV, baca langsung
+                    text = await file.text();
+                }
+
+                // Blueprint Parser Asli Tetap Bekerja Sempurna
+                const parseResult = parseCSVDynamic(text);
+                
+                if (parseResult && parseResult.monthsData.length > 0) {
+                    parseResult.monthsData.forEach(monthData => {
+                        processedDatasets.push(monthData);
+                        renderTable(monthData, processedDatasets.length - 1);
+                    });
+                    rawDataForDB.push(parseResult.rawDatabaseData);
+                }
+            }
+
+            if(rawDataForDB.length > 0) {
+                 saveToSheet(rawDataForDB);
+            }
+
+            processBtn.disabled = false;
+            processBtn.innerHTML = `<i data-lucide="cpu" class="w-5 h-5"></i> Proses Laporan Otomatis`;
+            globalActionContainer.classList.remove('hidden');
+            showToast("Laporan Berhasil Disusun & Dipisah!");
+            lucide.createIcons();
+        });
+
+        // FUNGSI: Parse CSV Dinamis (KUNCI MATI DARI FILE ASLI)
+        function parseCSVDynamic(csvText) {
+            let lines = csvText.split(/\r?\n/);
+            if (lines[0].trim().startsWith('sep=')) lines.shift();
+
+            let npsn = "";
+            let schoolName = "";
+            let headerRowIndex = -1;
+            for (let i = 0; i < lines.length && i < 15; i++) {
+                let cols = lines[i].split(';').map(c => c.replace(/"/g, ''));
+                if (cols[0]?.toUpperCase().includes('NPSN')) npsn = cols[1]?.replace(/[:]/g, '').trim() || "";
+                if (cols[0]?.toUpperCase().includes('NAMA SEKOLAH')) schoolName = cols[1]?.replace(/[:]/g, '').trim() || "";
+                if (cols[0]?.trim() === 'NO') { headerRowIndex = i; break; }
+            }
+
+            if (headerRowIndex === -1) return null;
+            let dataStartIndex = headerRowIndex + 3;
+            
+            let headerCols = lines[headerRowIndex].split(';');
+            let headerColsRow2 = lines[headerRowIndex + 1] ? lines[headerRowIndex + 1].split(';') : [];
+            
+            let firstDataCols = [];
+            for(let i = dataStartIndex; i < lines.length; i++) {
+                let testCols = lines[i].split(';');
+                if(testCols[0] && !isNaN(testCols[0].replace(/"/g,''))) {
+                    firstDataCols = testCols; break;
+                }
+            }
+            
+            let totalCols = firstDataCols.length;
+            let totalMonths = Math.max(1, Math.floor((totalCols - 10) / 5));
+
+            let extractedMonths = [];
+            for(let m = 0; m < totalMonths; m++) {
+                let monthStartIdx = 8 + (m * 5);
+                let mName = headerCols[monthStartIdx]?.trim().replace(/["']/g, '') ||
+                            headerColsRow2[monthStartIdx]?.trim().replace(/["']/g, '') ||
+                            `BULAN ${m+1}`;
+                if(mName === '') mName = `BULAN ${m+1}`;
+                extractedMonths.push(mName.toUpperCase());
+            }
+
+            let monthsData = [];
+            for(let m = 0; m < totalMonths; m++) {
+                monthsData.push({
+                    npsn: npsn,
+                    schoolName: schoolName || "SEKOLAH TANPA NAMA",
+                    monthName: extractedMonths[m],
+                    year: new Date().getFullYear().toString(),
+                    data: []
+                });
+            }
+
+            let rawDatabaseRows = [];
+            for (let i = dataStartIndex; i < lines.length; i++) {
+                if (lines[i].trim() === '') continue;
+                let cols = lines[i].split(';').map(c => c.trim().replace(/^'|^"|"$/g, ''));
+                
+                if (cols[0] && !isNaN(cols[0])) {
+                    while(cols.length < 8 + (totalMonths * 5) + 2) cols.push("");
+                    rawDatabaseRows.push(cols);
+                    
+                    let baseData = cols.slice(0, 8);
+                    let ket = cols[8 + (totalMonths * 5)];
+                    let pendamping = cols[8 + (totalMonths * 5) + 1];
+                    for(let m = 0; m < totalMonths; m++) {
+                        let mStart = 8 + (m * 5);
+                        let mData = cols.slice(mStart, mStart + 5);
+                        monthsData[m].data.push([...baseData, ...mData, ket, pendamping]);
+                    }
+                }
+            }
+
+            return { 
+                monthsData: monthsData, 
+                rawDatabaseData: { npsn, schoolName, monthNames: extractedMonths, rows: rawDatabaseRows } 
+            };
+        }
+
+        // FUNGSI: Render Halaman UI (Dengan Gaya Glassmorphism Card)
+        function renderTable(dataset, index) {
+            const card = document.createElement('div');
+            card.className = "glass-panel p-4 md:p-6 rounded-2xl mb-10";
+            const headerHTML = `
+                <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-end border-b-2 border-indigo-200 pb-4 gap-4">
+                    <div>
+                        <h3 class="text-xl md:text-2xl font-black uppercase leading-tight text-indigo-900">${dataset.schoolName}</h3>
+                        <p class="text-[12px] font-bold mt-2 uppercase tracking-widest text-indigo-800 bg-indigo-100 inline-block px-3 py-1 rounded-full border border-indigo-300 shadow-sm">
+                            LAPORAN BULAN: ${dataset.monthName} ${dataset.year}
+                        </p>
+                        <p class="text-[10px] font-bold mt-3 uppercase tracking-widest text-gray-600 bg-white/50 inline-block px-2 py-1 rounded">NPSN: ${dataset.npsn}</p>
+                    </div>
+                    <div class="w-full md:w-auto grid grid-cols-2 gap-2">
+                        <button onclick="downloadSinglePDF(${index})" class="w-full px-4 py-3 bg-red-600 text-white text-[11px] font-bold hover:bg-red-700 uppercase tracking-widest transition-all flex items-center justify-center gap-2 rounded-xl shadow-md">
+                            <i data-lucide="file-text" class="w-4 h-4"></i> PDF (${dataset.monthName})
+                        </button>
+                        <button onclick="downloadSingleExcel(${index})" class="w-full px-4 py-3 bg-emerald-600 text-white text-[11px] font-bold hover:bg-emerald-700 uppercase tracking-widest transition-all flex items-center justify-center gap-2 rounded-xl shadow-md">
+                            <i data-lucide="sheet" class="w-4 h-4"></i> EXCEL (${dataset.monthName})
+                        </button>
+                    </div>
+                </div>
+            `;
+            let rowsHTML = dataset.data.map(row => `
+                <tr class="border-b border-gray-300 hover:bg-white/50 transition-colors">
+                    ${row.map((cell, idx) => `<td class="${idx === 0 || (idx >= 8 && idx <= 12) ? 'text-center' : ''}">${cell}</td>`).join('')}
+                </tr>
+            `).join('');
+            const tableHTML = `
+                <div class="table-container overflow-x-auto border-2 border-indigo-100 rounded-xl bg-white/80">
+                    <table class="office-table w-full">
+                        <thead>
+                            <tr>
+                                <th rowspan="3">NO</th><th rowspan="3">NIK PENGURUS</th><th rowspan="3">NAMA PENGURUS</th>
+                                <th rowspan="3">NIK SISWA</th><th rowspan="3">NISN</th><th rowspan="3">NAMA SISWA</th>
+                                <th rowspan="3">BENTUK</th><th rowspan="3">TINGKAT</th>
+                                <th colspan="5" class="bg-indigo-100">${dataset.monthName}</th>
+                                <th rowspan="3">KET</th><th rowspan="3">PENDAMPING</th>
+                            </tr>
+                            <tr><th colspan="5" class="italic text-[9px] bg-indigo-50">Hari Efektif: .............</th></tr>
+                            <tr>
+                                <th class="bg-indigo-50">A</th><th class="bg-indigo-50">I</th><th class="bg-indigo-50">S</th><th class="bg-indigo-50">JML</th><th class="bg-indigo-50">%</th>
+                            </tr>
+                        </thead>
+                        <tbody>${rowsHTML}</tbody>
+                    </table>
+                </div>
+            `;
+            card.innerHTML = headerHTML + tableHTML;
+            resultContainer.appendChild(card);
+            lucide.createIcons();
+        }
+
+        // --- FUNGSI PDF (BLUEPRINT ASLI) ---
+        function drawPDFContent(doc, data) {
+            const pageW = doc.internal.pageSize.getWidth();
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(14);
+            doc.text("FORM VERIFIKASI KOMITMEN PENDIDIKAN", 15, 15);
+            doc.setFontSize(10);
+            doc.setTextColor(200, 0, 0);
+            doc.text(`PERIODE: ${data.monthName} ${data.year}`, 15, 21);
+            doc.setTextColor(0, 0, 0);
+            doc.setFontSize(9);
+            doc.setFont("helvetica", "normal");
+            doc.text(`NPSN         : ${data.npsn}`, 15, 27);
+            doc.text(`NAMA SEKOLAH : ${data.schoolName}`, 15, 32);
+
+            let nRows = data.data.length;
+            let isOrphanRisk = false;
+            
+            if (nRows > 16) {
+                let remaining = nRows - 16;
+                let rowsOnLastPage = remaining % 19;
+                if (rowsOnLastPage > 0 && rowsOnLastPage <= 3) isOrphanRisk = true;
+            } else if (nRows >= 14 && nRows <= 16) {
+                isOrphanRisk = true;
+            }
+
+            let finalBody = data.data.map((row, index) => {
+                let cellStyles = {};
+                if (isOrphanRisk && index === nRows - 3) cellStyles = { pageBreak: 'always' };
+                return row.map((cell, cIdx) => ({ 
+                    content: cell, 
+                    styles: (cIdx === 0 || (cIdx >= 8 && cIdx <= 12)) ? Object.assign({halign: 'center'}, cellStyles) : cellStyles 
+                }));
+            });
+            doc.autoTable({
+                startY: 38,
+                head: [
+                    [
+                        { content: 'NO', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
+                        { content: 'NIK PENGURUS', rowSpan: 3, styles: { valign: 'middle' } },
+                        { content: 'NAMA PENGURUS', rowSpan: 3, styles: { valign: 'middle' } },
+                        { content: 'NIK SISWA', rowSpan: 3, styles: { valign: 'middle' } },
+                        { content: 'NISN', rowSpan: 3, styles: { valign: 'middle' } },
+                        { content: 'NAMA SISWA', rowSpan: 3, styles: { valign: 'middle' } },
+                        { content: 'BENTUK', rowSpan: 3, styles: { valign: 'middle' } },
+                        { content: 'TINGKAT', rowSpan: 3, styles: { valign: 'middle' } },
+                        { content: data.monthName, colSpan: 5, styles: { halign: 'center', fillColor: [230, 230, 230] } },
+                        { content: 'KET', rowSpan: 3, styles: { valign: 'middle' } },
+                        { content: 'PENDAMPING', rowSpan: 3, styles: { valign: 'middle' } }
+                    ],
+                    [ { content: 'Hari Efektif: .............', colSpan: 5, styles: { fontSize: 7, fontStyle: 'italic', halign: 'center' } } ],
+                    [ 'A','I','S','JML','%' ]
+                ],
+                body: finalBody,
+                theme: 'grid',
+                styles: { fontSize: 8, textColor: 0, lineColor: 0, lineWidth: 0.1, font: 'helvetica' },
+                headStyles: { fillColor: 255, textColor: 0, fontStyle: 'bold' },
+                margin: { left: 10, right: 10, bottom: 45 } 
+            });
+
+            let finalY = doc.lastAutoTable.finalY + 15;
+            doc.setFontSize(10);
+            const dateText = `TAPIN,                                                  ${data.year}`;
+            const dateWidth = doc.getTextWidth(dateText);
+            const dateX = pageW - dateWidth - 20; 
+            doc.text(dateText, dateX, finalY);
+            const signX = pageW - 75;
+            doc.text("MENGETAHUI,", signX, finalY + 6);
+            doc.text("........................................................", signX - 10, finalY + 28);
+        }
+
+        // --- FUNGSI EXPORT EXCEL (BLUEPRINT ASLI) ---
+        function getExcelSheetData(data) {
+            let wsData = [];
+            wsData.push(["FORM VERIFIKASI KOMITMEN PENDIDIKAN"]);
+            wsData.push([`PERIODE: ${data.monthName} ${data.year}`]);
+            wsData.push([`NPSN         : ${data.npsn}`]);
+            wsData.push([`NAMA SEKOLAH : ${data.schoolName}`]);
+            wsData.push([]);
+            wsData.push(["NO", "NIK PENGURUS", "NAMA PENGURUS", "NIK SISWA", "NISN", "NAMA SISWA", "BENTUK", "TINGKAT", "HARI EFEKTIF: .............", "", "", "", "", "KET", "PENDAMPING"]);
+            wsData.push(["", "", "", "", "", "", "", "", "A", "I", "S", "JML", "%", "", ""]);
+            data.data.forEach(row => wsData.push(row));
+            wsData.push([]); wsData.push([]);
+            wsData.push(["", "", "", "", "", "", "", "", "", "", "", `TAPIN, ........................... ${data.year}`]);
+            wsData.push(["", "", "", "", "", "", "", "", "", "", "", "MENGETAHUI,"]);
+            wsData.push([]); wsData.push([]); wsData.push([]);
+            wsData.push(["", "", "", "", "", "", "", "", "", "", "", "......................................................."]);
+            return wsData;
+        }
+
+        function downloadSingleExcel(index) {
+            const data = processedDatasets[index];
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(getExcelSheetData(data));
+            XLSX.utils.book_append_sheet(wb, ws, data.monthName.substring(0, 31));
+            XLSX.writeFile(wb, `${data.schoolName}_${data.monthName}_${data.year}.xlsx`);
+        }
+
+        function downloadMergedExcel() {
+            const wb = XLSX.utils.book_new();
+            processedDatasets.forEach(data => {
+                const ws = XLSX.utils.aoa_to_sheet(getExcelSheetData(data));
+                let sheetName = `${data.schoolName}_${data.monthName}`.substring(0, 31);
+                XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            });
+            XLSX.writeFile(wb, `Gabungan_Laporan_Verifikasi.xlsx`);
+        }
+
+        async function downloadAllIndividualExcels() {
+            for (let i = 0; i < processedDatasets.length; i++) {
+                downloadSingleExcel(i);
+                await new Promise(r => setTimeout(r, 600));
+            }
+            showToast("Semua Excel berhasil diunduh terpisah!");
+        }
+
+        function downloadSinglePDF(index) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]); 
+            const data = processedDatasets[index];
+            drawPDFContent(doc, data);
+            doc.save(`${data.schoolName}_${data.monthName}_${data.year}.pdf`);
+        }
+
+        async function downloadAllIndividualPDFs() {
+            for (let i = 0; i < processedDatasets.length; i++) {
+                downloadSinglePDF(i);
+                await new Promise(r => setTimeout(r, 800));
+            }
+            showToast("Semua PDF berhasil diunduh terpisah!");
+        }
+
+        function downloadAllMergedPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]);
+            processedDatasets.forEach((data, i) => {
+                if (i > 0) doc.addPage();
+                drawPDFContent(doc, data);
+            });
+            doc.save(`Gabungan_Laporan_Verifikasi.pdf`);
+        }
+
+        // DATABASE PENGHUBUNG GITHUB KE GAS
+        function saveToSheet(rawDataArray) {
+            if(!GAS_WEBAPP_URL || GAS_WEBAPP_URL.includes("ID_WEB_APP_ANDA")) {
+                console.warn("GAS URL belum diatur.");
+                return;
+            }
+            
+            fetch(GAS_WEBAPP_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' }, // Pakai text/plain untuk bypass preflight yang rumit jika diperlukan
+                body: JSON.stringify({ data: rawDataArray })
+            })
+            .then(response => response.json())
+            .then(result => console.log("Database response:", result))
+            .catch(error => console.error("Database error:", error));
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMsg').innerText = msg;
+            toast.classList.remove('opacity-0');
+            toast.classList.add('opacity-100', 'bottom-16');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'bottom-16');
+                toast.classList.add('opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
