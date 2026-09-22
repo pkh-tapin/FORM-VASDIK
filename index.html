@@ -10,35 +10,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        /* Modern Glassmorphism & Glossy UI */
         body {
             background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
             min-height: 100vh;
         }
         .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.75);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.8);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
         }
-        
         .table-container::-webkit-scrollbar { height: 8px; }
-        .table-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px;}
+        .table-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
         .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        .table-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-        
         th, td { white-space: nowrap; font-family: 'Courier New', Courier, monospace; }
-        
         .office-table { border: 2px solid #000; }
         .office-table th, .office-table td { border: 1px solid #000 !important; color: #000 !important; padding: 6px 8px !important; font-size: 11px; }
         .office-table thead th { background-color: #f3f4f6 !important; font-weight: bold; text-align: center; vertical-align: middle; }
-        .preview-card { max-width: 100%; overflow: hidden; }
-
-        @media (max-width: 768px) {
-            .preview-card { padding: 1rem; }
-            h3 { font-size: 1.25rem; }
-        }
     </style>
 </head>
 <body class="text-gray-900 font-sans">
@@ -56,7 +45,7 @@
 
     <main class="max-w-full mx-auto px-4 md:px-6 py-6 md:py-8">
         
-        <div class="glass-panel rounded-2xl p-5 md:p-8 mb-8 no-print transition-all hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)]">
+        <div class="glass-panel rounded-2xl p-5 md:p-8 mb-8 no-print transition-all">
             <h2 class="text-xl font-black mb-6 text-indigo-900 flex items-center gap-2 uppercase border-b-2 border-indigo-200 pb-3">
                 <i data-lucide="file-up" class="w-6 h-6"></i>
                 Input Data Laporan
@@ -75,11 +64,11 @@
                 </div>
                 
                 <div class="bg-white/50 p-5 rounded-xl border border-white shadow-sm">
-                    <h3 class="font-black text-sm mb-3 uppercase border-b border-indigo-200 pb-2 text-indigo-900">Blueprint Sistem Aktif:</h3>
+                    <h3 class="font-black text-sm mb-3 uppercase border-b border-indigo-200 pb-2 text-indigo-900">Spesifikasi Cetak:</h3>
                     <ul class="space-y-2 text-[11px] md:text-xs text-gray-800 font-medium leading-relaxed">
-                        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Mendukung Excel (.xlsx) & CSV.</span></li>
-                        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Export F4 & Anti-Orphan TTD.</span></li>
-                        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Koneksi Database Bebas Multi-Login.</span></li>
+                        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Format PDF Landscape F4/Folio.</span></li>
+                        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Header Teks Hitam Solid Pas Sesuai Template.</span></li>
+                        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Sintaks Bebas Error Syntax JS.</span></li>
                     </ul>
                 </div>
             </div>
@@ -87,7 +76,7 @@
             <div id="fileList" class="mt-5 flex flex-wrap gap-2 hidden"></div>
             
             <div class="mt-6 flex gap-3 hidden" id="actionButtons">
-                <button id="processBtn" class="w-full px-4 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-black rounded-xl shadow-[0_10px_20px_rgba(79,70,229,0.3)] transition-all flex justify-center items-center gap-2 uppercase tracking-widest text-sm transform hover:-translate-y-1">
+                <button id="processBtn" class="w-full px-4 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-black rounded-xl shadow-lg transition-all flex justify-center items-center gap-2 uppercase tracking-widest text-sm transform hover:-translate-y-1">
                     <i data-lucide="cpu" class="w-5 h-5"></i>
                     Proses Laporan Otomatis
                 </button>
@@ -98,13 +87,13 @@
             <button onclick="downloadAllIndividualPDFs()" class="glass-panel w-full px-4 py-4 !bg-red-500/10 hover:!bg-red-500/20 !border-red-500/30 text-red-700 font-black rounded-xl shadow-lg flex items-center justify-center gap-2 uppercase tracking-tighter text-xs transition-all">
                 <i data-lucide="download" class="w-4 h-4"></i> PDF Terpisah
             </button>
-            <button onclick="downloadAllMergedPDF()" class="w-full px-4 py-4 bg-gradient-to-r from-red-700 to-red-600 hover:from-red-800 hover:to-red-700 text-white font-black rounded-xl shadow-[0_8px_15px_rgba(220,38,38,0.3)] flex items-center justify-center gap-2 uppercase tracking-tighter text-xs transition-all transform hover:-translate-y-1">
+            <button onclick="downloadAllMergedPDF()" class="w-full px-4 py-4 bg-gradient-to-r from-red-700 to-red-600 hover:from-red-800 hover:to-red-700 text-white font-black rounded-xl shadow-md flex items-center justify-center gap-2 uppercase tracking-tighter text-xs transition-all transform hover:-translate-y-1">
                 <i data-lucide="file-text" class="w-4 h-4"></i> Cetak Semua (1 PDF)
             </button>
             <button onclick="downloadAllIndividualExcels()" class="glass-panel w-full px-4 py-4 !bg-emerald-500/10 hover:!bg-emerald-500/20 !border-emerald-500/30 text-emerald-700 font-black rounded-xl shadow-lg flex items-center justify-center gap-2 uppercase tracking-tighter text-xs transition-all">
                 <i data-lucide="sheet" class="w-4 h-4"></i> Excel Terpisah
             </button>
-            <button onclick="downloadMergedExcel()" class="w-full px-4 py-4 bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-700 hover:to-green-600 text-white font-black rounded-xl shadow-[0_8px_15px_rgba(5,150,105,0.3)] flex items-center justify-center gap-2 uppercase tracking-tighter text-xs transition-all transform hover:-translate-y-1">
+            <button onclick="downloadMergedExcel()" class="w-full px-4 py-4 bg-gradient-to-r from-emerald-600 to-green-500 hover:from-emerald-700 hover:to-green-600 text-white font-black rounded-xl shadow-md flex items-center justify-center gap-2 uppercase tracking-tighter text-xs transition-all transform hover:-translate-y-1">
                 <i data-lucide="book" class="w-4 h-4"></i> Cetak Semua (1 Excel)
             </button>
         </div>
@@ -120,7 +109,7 @@
     <script>
         lucide.createIcons();
         
-        // --- URL WEB APP GAS ---
+        // PASTE URL WEB APP HASIL DEPLOY DI SINI
         const GAS_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbz7nwv4NriNKVKoaPppqEApWaQWD8PV8QH9f9GL81J_RV7u9ayji3aJmm1_a-GmnqyUvw/exec"; 
 
         let processedDatasets = [];
@@ -133,13 +122,13 @@
         const resultContainer = document.getElementById('resultContainer');
         const globalActionContainer = document.getElementById('globalActionContainer');
 
-        fileInput.addEventListener('change', (e) => {
+        fileInput.addEventListener('change', function(e) {
             fileList.innerHTML = '';
             const files = e.target.files;
             if (files.length > 0) {
                 fileList.classList.remove('hidden');
                 actionButtons.classList.remove('hidden');
-                Array.from(files).forEach(file => {
+                Array.from(files).forEach(function(file) {
                     const badge = document.createElement('span');
                     badge.className = "px-3 py-1 bg-white/70 backdrop-blur-sm border border-indigo-200 text-indigo-900 rounded-full text-[10px] font-bold uppercase shadow-sm";
                     badge.innerText = file.name;
@@ -149,7 +138,7 @@
             }
         });
 
-        processBtn.addEventListener('click', async () => {
+        processBtn.addEventListener('click', async function() {
             const files = fileInput.files;
             if (files.length === 0) return;
 
@@ -158,7 +147,7 @@
             processedDatasets = [];
             rawDataForDB = [];
             processBtn.disabled = true;
-            processBtn.innerHTML = `<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Memproses...`;
+            processBtn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Memproses...';
             lucide.createIcons();
 
             for (let i = 0; i < files.length; i++) {
@@ -177,7 +166,7 @@
                 const parseResult = parseCSVDynamic(text);
                 
                 if (parseResult && parseResult.monthsData.length > 0) {
-                    parseResult.monthsData.forEach(monthData => {
+                    parseResult.monthsData.forEach(function(monthData) {
                         processedDatasets.push(monthData);
                         renderTable(monthData, processedDatasets.length - 1);
                     });
@@ -185,18 +174,18 @@
                 }
             }
 
-            if(rawDataForDB.length > 0) {
-                 saveToSheet(rawDataForDB);
+            if (rawDataForDB.length > 0) {
+                saveToSheet(rawDataForDB);
             }
 
             processBtn.disabled = false;
-            processBtn.innerHTML = `<i data-lucide="cpu" class="w-5 h-5"></i> Proses Laporan Otomatis`;
+            processBtn.innerHTML = '<i data-lucide="cpu" class="w-5 h-5"></i> Proses Laporan Otomatis';
             globalActionContainer.classList.remove('hidden');
             showToast("Laporan Berhasil Disusun & Dipisah!");
             lucide.createIcons();
         });
 
-        // FUNGSI: Parse CSV Dinamis (KUNCI BLUEPRINT ASLI)
+        // PARSER DINAMIS (BLUEPRINT N-BULAN)
         function parseCSVDynamic(csvText) {
             let lines = csvText.split(/\r?\n/);
             if (lines[0].trim().startsWith('sep=')) lines.shift();
@@ -204,11 +193,12 @@
             let npsn = "";
             let schoolName = "";
             let headerRowIndex = -1;
+
             for (let i = 0; i < lines.length && i < 15; i++) {
-                let cols = lines[i].split(';').map(c => c.replace(/"/g, ''));
-                if (cols[0]?.toUpperCase().includes('NPSN')) npsn = cols[1]?.replace(/[:]/g, '').trim() || "";
-                if (cols[0]?.toUpperCase().includes('NAMA SEKOLAH')) schoolName = cols[1]?.replace(/[:]/g, '').trim() || "";
-                if (cols[0]?.trim() === 'NO') { headerRowIndex = i; break; }
+                let cols = lines[i].split(';').map(function(c) { return c.replace(/"/g, ''); });
+                if (cols[0] && cols[0].toUpperCase().includes('NPSN')) npsn = cols[1] ? cols[1].replace(/[:]/g, '').trim() : "";
+                if (cols[0] && cols[0].toUpperCase().includes('NAMA SEKOLAH')) schoolName = cols[1] ? cols[1].replace(/[:]/g, '').trim() : "";
+                if (cols[0] && cols[0].trim() === 'NO') { headerRowIndex = i; break; }
             }
 
             if (headerRowIndex === -1) return null;
@@ -218,9 +208,9 @@
             let headerColsRow2 = lines[headerRowIndex + 1] ? lines[headerRowIndex + 1].split(';') : [];
             
             let firstDataCols = [];
-            for(let i = dataStartIndex; i < lines.length; i++) {
+            for (let i = dataStartIndex; i < lines.length; i++) {
                 let testCols = lines[i].split(';');
-                if(testCols[0] && !isNaN(testCols[0].replace(/"/g,''))) {
+                if (testCols[0] && !isNaN(testCols[0].replace(/"/g, ''))) {
                     firstDataCols = testCols; break;
                 }
             }
@@ -229,17 +219,17 @@
             let totalMonths = Math.max(1, Math.floor((totalCols - 10) / 5));
 
             let extractedMonths = [];
-            for(let m = 0; m < totalMonths; m++) {
+            for (let m = 0; m < totalMonths; m++) {
                 let monthStartIdx = 8 + (m * 5);
-                let mName = headerCols[monthStartIdx]?.trim().replace(/["']/g, '') ||
-                            headerColsRow2[monthStartIdx]?.trim().replace(/["']/g, '') ||
-                            `BULAN ${m+1}`;
-                if(mName === '') mName = `BULAN ${m+1}`;
+                let mName = (headerCols[monthStartIdx] ? headerCols[monthStartIdx].trim().replace(/["']/g, '') : '') ||
+                            (headerColsRow2[monthStartIdx] ? headerColsRow2[monthStartIdx].trim().replace(/["']/g, '') : '') ||
+                            ('BULAN ' + (m + 1));
+                if (mName === '') mName = 'BULAN ' + (m + 1);
                 extractedMonths.push(mName.toUpperCase());
             }
 
             let monthsData = [];
-            for(let m = 0; m < totalMonths; m++) {
+            for (let m = 0; m < totalMonths; m++) {
                 monthsData.push({
                     npsn: npsn,
                     schoolName: schoolName || "SEKOLAH TANPA NAMA",
@@ -252,98 +242,102 @@
             let rawDatabaseRows = [];
             for (let i = dataStartIndex; i < lines.length; i++) {
                 if (lines[i].trim() === '') continue;
-                let cols = lines[i].split(';').map(c => c.trim().replace(/^'|^"|"$/g, ''));
+                let cols = lines[i].split(';').map(function(c) { return c.trim().replace(/^'|^"|"$/g, ''); });
                 
                 if (cols[0] && !isNaN(cols[0])) {
-                    while(cols.length < 8 + (totalMonths * 5) + 2) cols.push("");
+                    while (cols.length < 8 + (totalMonths * 5) + 2) cols.push("");
                     rawDatabaseRows.push(cols);
                     
                     let baseData = cols.slice(0, 8);
                     let ket = cols[8 + (totalMonths * 5)];
                     let pendamping = cols[8 + (totalMonths * 5) + 1];
-                    for(let m = 0; m < totalMonths; m++) {
+
+                    for (let m = 0; m < totalMonths; m++) {
                         let mStart = 8 + (m * 5);
                         let mData = cols.slice(mStart, mStart + 5);
-                        monthsData[m].data.push([...baseData, ...mData, ket, pendamping]);
+                        monthsData[m].data.push(baseData.concat(mData, [ket, pendamping]));
                     }
                 }
             }
 
             return { 
                 monthsData: monthsData, 
-                rawDatabaseData: { npsn, schoolName, monthNames: extractedMonths, rows: rawDatabaseRows } 
+                rawDatabaseData: { npsn: npsn, schoolName: schoolName, monthNames: extractedMonths, rows: rawDatabaseRows } 
             };
         }
 
-        // FUNGSI: Render Halaman UI (Glassmorphism)
         function renderTable(dataset, index) {
             const card = document.createElement('div');
             card.className = "glass-panel p-4 md:p-6 rounded-2xl mb-10";
-            const headerHTML = `
-                <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-end border-b-2 border-indigo-200 pb-4 gap-4">
-                    <div>
-                        <h3 class="text-xl md:text-2xl font-black uppercase leading-tight text-indigo-900">${dataset.schoolName}</h3>
-                        <p class="text-[12px] font-bold mt-2 uppercase tracking-widest text-indigo-800 bg-indigo-100 inline-block px-3 py-1 rounded-full border border-indigo-300 shadow-sm">
-                            LAPORAN BULAN: ${dataset.monthName} ${dataset.year}
-                        </p>
-                        <p class="text-[10px] font-bold mt-3 uppercase tracking-widest text-gray-600 bg-white/50 inline-block px-2 py-1 rounded">NPSN: ${dataset.npsn}</p>
-                    </div>
-                    <div class="w-full md:w-auto grid grid-cols-2 gap-2">
-                        <button onclick="downloadSinglePDF(${index})" class="w-full px-4 py-3 bg-red-600 text-white text-[11px] font-bold hover:bg-red-700 uppercase tracking-widest transition-all flex items-center justify-center gap-2 rounded-xl shadow-md">
-                            <i data-lucide="file-text" class="w-4 h-4"></i> PDF (${dataset.monthName})
-                        </button>
-                        <button onclick="downloadSingleExcel(${index})" class="w-full px-4 py-3 bg-emerald-600 text-white text-[11px] font-bold hover:bg-emerald-700 uppercase tracking-widest transition-all flex items-center justify-center gap-2 rounded-xl shadow-md">
-                            <i data-lucide="sheet" class="w-4 h-4"></i> EXCEL (${dataset.monthName})
-                        </button>
-                    </div>
-                </div>
-            `;
-            let rowsHTML = dataset.data.map(row => `
-                <tr class="border-b border-gray-300 hover:bg-white/50 transition-colors">
-                    ${row.map((cell, idx) => `<td class="${idx === 0 \vert{}\vert{} (idx >= 8 && idx <= 12) ? 'text-center' : ''}">${cell}</td>`).join('')}
-                </tr>
-            `).join('');
-            const tableHTML = `
-                <div class="table-container overflow-x-auto border-2 border-indigo-100 rounded-xl bg-white/80">
-                    <table class="office-table w-full">
-                        <thead>
-                            <tr>
-                                <th rowspan="3">NO</th><th rowspan="3">NIK PENGURUS</th><th rowspan="3">NAMA PENGURUS</th>
-                                <th rowspan="3">NIK SISWA</th><th rowspan="3">NISN</th><th rowspan="3">NAMA SISWA</th>
-                                <th rowspan="3">BENTUK</th><th rowspan="3">TINGKAT</th>
-                                <th colspan="5" class="bg-indigo-100">${dataset.monthName}</th>
-                                <th rowspan="3">KET</th><th rowspan="3">PENDAMPING</th>
-                            </tr>
-                            <tr><th colspan="5" class="italic text-[9px] bg-indigo-50">Hari Efektif: .............</th></tr>
-                            <tr>
-                                <th class="bg-indigo-50">A</th><th class="bg-indigo-50">I</th><th class="bg-indigo-50">S</th><th class="bg-indigo-50">JML</th><th class="bg-indigo-50">%</th>
-                            </tr>
-                        </thead>
-                        <tbody>${rowsHTML}</tbody>
-                    </table>
-                </div>
-            `;
+
+            let headerHTML = 
+                '<div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-end border-b-2 border-indigo-200 pb-4 gap-4">' +
+                    '<div>' +
+                        '<h3 class="text-xl md:text-2xl font-black uppercase leading-tight text-indigo-900">' + dataset.schoolName + '</h3>' +
+                        '<p class="text-[12px] font-bold mt-2 uppercase tracking-widest text-indigo-800 bg-indigo-100 inline-block px-3 py-1 rounded-full border border-indigo-300 shadow-sm">' +
+                            'LAPORAN BULAN: ' + dataset.monthName + ' ' + dataset.year +
+                        '</p>' +
+                        '<p class="text-[10px] font-bold mt-3 uppercase tracking-widest text-gray-600 bg-white/50 inline-block px-2 py-1 rounded">NPSN: ' + dataset.npsn + '</p>' +
+                    '</div>' +
+                    '<div class="w-full md:w-auto grid grid-cols-2 gap-2">' +
+                        '<button onclick="downloadSinglePDF(' + index + ')" class="w-full px-4 py-3 bg-red-600 text-white text-[11px] font-bold hover:bg-red-700 uppercase tracking-widest transition-all flex items-center justify-center gap-2 rounded-xl shadow-md">' +
+                            '<i data-lucide="file-text" class="w-4 h-4"></i> PDF (' + dataset.monthName + ')' +
+                        '</button>' +
+                        '<button onclick="downloadSingleExcel(' + index + ')" class="w-full px-4 py-3 bg-emerald-600 text-white text-[11px] font-bold hover:bg-emerald-700 uppercase tracking-widest transition-all flex items-center justify-center gap-2 rounded-xl shadow-md">' +
+                            '<i data-lucide="sheet" class="w-4 h-4"></i> EXCEL (' + dataset.monthName + ')' +
+                        '</button>' +
+                    '</div>' +
+                '</div>';
+
+            let rowsHTML = dataset.data.map(function(row) {
+                let cells = row.map(function(cell, idx) {
+                    let centerStyle = (idx === 0 || (idx >= 8 && idx <= 12)) ? 'text-center' : '';
+                    return '<td class="' + centerStyle + '">' + (cell || '') + '</td>';
+                }).join('');
+                return '<tr class="border-b border-gray-300 hover:bg-white/50 transition-colors">' + cells + '</tr>';
+            }).join('');
+
+            let tableHTML = 
+                '<div class="table-container overflow-x-auto border-2 border-indigo-100 rounded-xl bg-white/80">' +
+                    '<table class="office-table w-full">' +
+                        '<thead>' +
+                            '<tr>' +
+                                '<th rowspan="3">NO</th><th rowspan="3">NIK PENGURUS</th><th rowspan="3">NAMA PENGURUS</th>' +
+                                '<th rowspan="3">NIK SISWA</th><th rowspan="3">NISN</th><th rowspan="3">NAMA SISWA</th>' +
+                                '<th rowspan="3">BENTUK</th><th rowspan="3">TINGKAT</th>' +
+                                '<th colspan="5" class="bg-indigo-100">' + dataset.monthName + '</th>' +
+                                '<th rowspan="3">KET</th><th rowspan="3">PENDAMPING</th>' +
+                            '</tr>' +
+                            '<tr><th colspan="5" class="italic text-[9px] bg-indigo-50">Hari Efektif: .............</th></tr>' +
+                            '<tr>' +
+                                '<th class="bg-indigo-50">A</th><th class="bg-indigo-50">I</th><th class="bg-indigo-50">S</th><th class="bg-indigo-50">JML</th><th class="bg-indigo-50">%</th>' +
+                            '</tr>' +
+                        '</thead>' +
+                        '<tbody>' + rowsHTML + '</tbody>' +
+                    '</table>' +
+                '</div>';
+
             card.innerHTML = headerHTML + tableHTML;
             resultContainer.appendChild(card);
             lucide.createIcons();
         }
 
-        // --- FUNGSI PDF (WARNA HITAM SOLID & BORDER RAPI) ---
+        // GENERATE PDF LANDSCAPE F4
         function drawPDFContent(doc, data) {
             const pageW = doc.internal.pageSize.getWidth();
+            
             doc.setFont("helvetica", "bold");
-            doc.setFontSize(14);
-            doc.setTextColor(0, 0, 0); // Diubah menjadi hitam solid
+            doc.setFontSize(13);
+            doc.setTextColor(0, 0, 0);
             doc.text("FORM VERIFIKASI KOMITMEN PENDIDIKAN", 15, 15);
             
             doc.setFontSize(10);
-            doc.setTextColor(0, 0, 0); // Diubah menjadi hitam solid (sebelumnya merah)
-            doc.text(`PERIODE: ${data.monthName} ${data.year}`, 15, 21);
+            doc.text("PERIODE: " + data.monthName + " " + data.year, 15, 21);
             
             doc.setFontSize(9);
             doc.setFont("helvetica", "normal");
-            doc.text(`NPSN          : ${data.npsn}`, 15, 27);
-            doc.text(`NAMA SEKOLAH : ${data.schoolName}`, 15, 32);
+            doc.text("NPSN          : " + data.npsn, 15, 27);
+            doc.text("NAMA SEKOLAH : " + data.schoolName, 15, 32);
 
             let nRows = data.data.length;
             let isOrphanRisk = false;
@@ -356,125 +350,107 @@
                 isOrphanRisk = true;
             }
 
-            let finalBody = data.data.map((row, index) => {
+            let finalBody = data.data.map(function(row, index) {
                 let cellStyles = {};
                 if (isOrphanRisk && index === nRows - 3) cellStyles = { pageBreak: 'always' };
-                return row.map((cell, cIdx) => ({ 
-                    content: cell, 
-                    styles: (cIdx === 0 || (cIdx >= 8 && cIdx <= 12)) ? Object.assign({halign: 'center'}, cellStyles) : cellStyles 
-                }));
+                return row.map(function(cell, cIdx) {
+                    return { 
+                        content: cell, 
+                        styles: (cIdx === 0 || (cIdx >= 8 && cIdx <= 12)) ? Object.assign({halign: 'center'}, cellStyles) : cellStyles 
+                    };
+                });
             });
 
             doc.autoTable({
-                startY: 38,
+                startY: 37,
                 head: [
                     [
                         { content: 'NO', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
-                        { content: 'NIK PENGURUS', rowSpan: 3, styles: { valign: 'middle' } },
-                        { content: 'NAMA PENGURUS', rowSpan: 3, styles: { valign: 'middle' } },
-                        { content: 'NIK SISWA', rowSpan: 3, styles: { valign: 'middle' } },
-                        { content: 'NISN', rowSpan: 3, styles: { valign: 'middle' } },
-                        { content: 'NAMA SISWA', rowSpan: 3, styles: { valign: 'middle' } },
-                        { content: 'BENTUK', rowSpan: 3, styles: { valign: 'middle' } },
-                        { content: 'TINGKAT', rowSpan: 3, styles: { valign: 'middle' } },
-                        { content: data.monthName, colSpan: 5, styles: { halign: 'center', fillColor: [240, 240, 240] } },
-                        { content: 'KET', rowSpan: 3, styles: { valign: 'middle' } },
-                        { content: 'PENDAMPING', rowSpan: 3, styles: { valign: 'middle' } }
+                        { content: 'NIK PENGURUS', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
+                        { content: 'NAMA PENGURUS', rowSpan: 3, styles: { halign: 'left', valign: 'middle' } },
+                        { content: 'NIK SISWA', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
+                        { content: 'NISN', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
+                        { content: 'NAMA SISWA', rowSpan: 3, styles: { halign: 'left', valign: 'middle' } },
+                        { content: 'BENTUK', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
+                        { content: 'TINGKAT', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
+                        { content: data.monthName, colSpan: 5, styles: { halign: 'center', valign: 'middle' } },
+                        { content: 'KET', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
+                        { content: 'PENDAMPING', rowSpan: 3, styles: { halign: 'left', valign: 'middle' } }
                     ],
-                    [ { content: 'Hari Efektif: .............', colSpan: 5, styles: { fontSize: 7, fontStyle: 'italic', halign: 'center' } } ],
+                    [ { content: 'Hari Efektif: .............', colSpan: 5, styles: { fontSize: 7, fontStyle: 'italic', halign: 'center', valign: 'middle' } } ],
                     [ 'A','I','S','JML','%' ]
                 ],
                 body: finalBody,
                 theme: 'grid',
                 styles: { fontSize: 8, textColor: 0, lineColor: 0, lineWidth: 0.1, font: 'helvetica' },
                 headStyles: { fillColor: 245, textColor: 0, fontStyle: 'bold', lineColor: 0, lineWidth: 0.1 },
-                margin: { left: 10, right: 10, bottom: 45 } 
+                margin: { left: 10, right: 10, bottom: 45 }
             });
 
-            let finalY = doc.lastAutoTable.finalY + 15;
+            let finalY = doc.lastAutoTable.finalY + 12;
             doc.setFontSize(10);
             doc.setTextColor(0, 0, 0);
-            const dateText = `TAPIN,                                                 ${data.year}`;
+            
+            const dateText = "TAPIN,                                                 " + data.year;
             const dateWidth = doc.getTextWidth(dateText);
             const dateX = pageW - dateWidth - 20; 
+            
             doc.text(dateText, dateX, finalY);
             const signX = pageW - 75;
             doc.text("MENGETAHUI,", signX, finalY + 6);
             doc.text("........................................................", signX - 10, finalY + 28);
         }
 
-        // --- FUNGSI EXPORT EXCEL DISEMPURNAKAN (IDENTIK DENGAN PDF + STYLING & BORDER) ---
+        // GENERATE EXCEL
         function createStyledExcelSheet(data) {
             let wsData = [];
             
-            // Header Dokumen
             wsData.push(["FORM VERIFIKASI KOMITMEN PENDIDIKAN"]);
-            wsData.push([`PERIODE: ${data.monthName} ${data.year}`]);
-            wsData.push([`NPSN          : ${data.npsn}`]);
-            wsData.push([`NAMA SEKOLAH : ${data.schoolName}`]);
-            wsData.push([]); // Baris kosong
+            wsData.push(["PERIODE: " + data.monthName + " " + data.year]);
+            wsData.push(["NPSN          : " + data.npsn]);
+            wsData.push(["NAMA SEKOLAH : " + data.schoolName]);
+            wsData.push([]);
 
-            // Header Tabel (Multi-Baris Identik PDF)
             wsData.push(["NO", "NIK PENGURUS", "NAMA PENGURUS", "NIK SISWA", "NISN", "NAMA SISWA", "BENTUK", "TINGKAT", data.monthName, "", "", "", "", "KET", "PENDAMPING"]);
             wsData.push(["", "", "", "", "", "", "", "", "Hari Efektif: .............", "", "", "", "", "", ""]);
             wsData.push(["", "", "", "", "", "", "", "", "A", "I", "S", "JML", "%", "", ""]);
 
-            // Isian Data Laporan
-            data.data.forEach(row => wsData.push(row));
+            data.data.forEach(function(row) { wsData.push(row); });
 
-            // Footer / Area Tanda Tangan
             wsData.push([]);
             wsData.push([]);
-            wsData.push(["", "", "", "", "", "", "", "", "", "", "", `TAPIN, ........................... ${data.year}`]);
+            wsData.push(["", "", "", "", "", "", "", "", "", "", "", "TAPIN, ........................... " + data.year]);
             wsData.push(["", "", "", "", "", "", "", "", "", "", "", "MENGETAHUI,"]);
-            wsData.push([]);
             wsData.push([]);
             wsData.push([]);
             wsData.push(["", "", "", "", "", "", "", "", "", "", "", "......................................................."]);
 
             const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-            // Pengaturan Merge Cells Identik PDF
             ws['!merges'] = [
-                { s: { r: 0, c: 0 }, e: { r: 0, c: 14 } }, // Judul Utam
-                { s: { r: 1, c: 0 }, e: { r: 1, c: 14 } }, // Periode
-                { s: { r: 2, c: 0 }, e: { r: 2, c: 14 } }, // NPSN
-                { s: { r: 3, c: 0 }, e: { r: 3, c: 14 } }, // Sekolah
-                
-                // Merge Column Header
-                { s: { r: 5, c: 0 }, e: { r: 7, c: 0 } }, // NO
-                { s: { r: 5, c: 1 }, e: { r: 7, c: 1 } }, // NIK PENGURUS
-                { s: { r: 5, c: 2 }, e: { r: 7, c: 2 } }, // NAMA PENGURUS
-                { s: { r: 5, c: 3 }, e: { r: 7, c: 3 } }, // NIK SISWA
-                { s: { r: 5, c: 4 }, e: { r: 7, c: 4 } }, // NISN
-                { s: { r: 5, c: 5 }, e: { r: 7, c: 5 } }, // NAMA SISWA
-                { s: { r: 5, c: 6 }, e: { r: 7, c: 6 } }, // BENTUK
-                { s: { r: 5, c: 7 }, e: { r: 7, c: 7 } }, // TINGKAT
-                { s: { r: 5, c: 8 }, e: { r: 5, c: 12 } },// BULAN (Span 5 kolom)
-                { s: { r: 6, c: 8 }, e: { r: 6, c: 12 } },// Hari Efektif
-                { s: { r: 5, c: 13 }, e: { r: 7, c: 13 } },// KET
-                { s: { r: 5, c: 14 }, e: { r: 7, c: 14 } } // PENDAMPING
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 14 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 14 } },
+                { s: { r: 2, c: 0 }, e: { r: 2, c: 14 } },
+                { s: { r: 3, c: 0 }, e: { r: 3, c: 14 } },
+                { s: { r: 5, c: 0 }, e: { r: 7, c: 0 } },
+                { s: { r: 5, c: 1 }, e: { r: 7, c: 1 } },
+                { s: { r: 5, c: 2 }, e: { r: 7, c: 2 } },
+                { s: { r: 5, c: 3 }, e: { r: 7, c: 3 } },
+                { s: { r: 5, c: 4 }, e: { r: 7, c: 4 } },
+                { s: { r: 5, c: 5 }, e: { r: 7, c: 5 } },
+                { s: { r: 5, c: 6 }, e: { r: 7, c: 6 } },
+                { s: { r: 5, c: 7 }, e: { r: 7, c: 7 } },
+                { s: { r: 5, c: 8 }, e: { r: 5, c: 12 } },
+                { s: { r: 6, c: 8 }, e: { r: 6, c: 12 } },
+                { s: { r: 5, c: 13 }, e: { r: 7, c: 13 } },
+                { s: { r: 5, c: 14 }, e: { r: 7, c: 14 } }
             ];
 
-            // Pengaturan Auto Fit Lebar Kolom
-            const colWidths = [
-                { wch: 5 },  // NO
-                { wch: 18 }, // NIK PENGURUS
-                { wch: 25 }, // NAMA PENGURUS
-                { wch: 18 }, // NIK SISWA
-                { wch: 15 }, // NISN
-                { wch: 25 }, // NAMA SISWA
-                { wch: 10 }, // BENTUK
-                { wch: 10 }, // TINGKAT
-                { wch: 6 },  // A
-                { wch: 6 },  // I
-                { wch: 6 },  // S
-                { wch: 6 },  // JML
-                { wch: 8 },  // %
-                { wch: 12 }, // KET
-                { wch: 20 }  // PENDAMPING
+            ws['!cols'] = [
+                { wch: 5 }, { wch: 18 }, { wch: 25 }, { wch: 18 }, { wch: 15 },
+                { wch: 25 }, { wch: 10 }, { wch: 10 }, { wch: 6 }, { wch: 6 },
+                { wch: 6 }, { wch: 6 }, { wch: 8 }, { wch: 12 }, { wch: 22 }
             ];
-            ws['!cols'] = colWidths;
 
             return ws;
         }
@@ -484,23 +460,23 @@
             const wb = XLSX.utils.book_new();
             const ws = createStyledExcelSheet(data);
             XLSX.utils.book_append_sheet(wb, ws, data.monthName.substring(0, 31));
-            XLSX.writeFile(wb, `${data.schoolName}_${data.monthName}_${data.year}.xlsx`);
+            XLSX.writeFile(wb, data.schoolName + "_" + data.monthName + "_" + data.year + ".xlsx");
         }
 
         function downloadMergedExcel() {
             const wb = XLSX.utils.book_new();
-            processedDatasets.forEach(data => {
+            processedDatasets.forEach(function(data) {
                 const ws = createStyledExcelSheet(data);
-                let sheetName = `${data.schoolName}_${data.monthName}`.substring(0, 31);
+                let sheetName = (data.schoolName + "_" + data.monthName).substring(0, 31);
                 XLSX.utils.book_append_sheet(wb, ws, sheetName);
             });
-            XLSX.writeFile(wb, `Gabungan_Laporan_Verifikasi.xlsx`);
+            XLSX.writeFile(wb, "Gabungan_Laporan_Verifikasi.xlsx");
         }
 
         async function downloadAllIndividualExcels() {
             for (let i = 0; i < processedDatasets.length; i++) {
                 downloadSingleExcel(i);
-                await new Promise(r => setTimeout(r, 600));
+                await new Promise(function(r) { setTimeout(r, 600); });
             }
             showToast("Semua Excel berhasil diunduh terpisah!");
         }
@@ -510,13 +486,13 @@
             const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]); 
             const data = processedDatasets[index];
             drawPDFContent(doc, data);
-            doc.save(`${data.schoolName}_${data.monthName}_${data.year}.pdf`);
+            doc.save(data.schoolName + "_" + data.monthName + "_" + data.year + ".pdf");
         }
 
         async function downloadAllIndividualPDFs() {
             for (let i = 0; i < processedDatasets.length; i++) {
                 downloadSinglePDF(i);
-                await new Promise(r => setTimeout(r, 800));
+                await new Promise(function(r) { setTimeout(r, 800); });
             }
             showToast("Semua PDF berhasil diunduh terpisah!");
         }
@@ -524,28 +500,27 @@
         function downloadAllMergedPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]);
-            processedDatasets.forEach((data, i) => {
+            processedDatasets.forEach(function(data, i) {
                 if (i > 0) doc.addPage();
                 drawPDFContent(doc, data);
             });
-            doc.save(`Gabungan_Laporan_Verifikasi.pdf`);
+            doc.save("Gabungan_Laporan_Verifikasi.pdf");
         }
 
-        // DATABASE PENGHUBUNG GITHUB KE GAS
+        // DATABASE GOOGLE SHEET
         function saveToSheet(rawDataArray) {
-            if(!GAS_WEBAPP_URL || GAS_WEBAPP_URL.includes("ID_WEB_APP_ANDA")) {
-                console.warn("GAS URL belum diatur.");
-                return;
-            }
+            if (!GAS_WEBAPP_URL) return;
             
             fetch(GAS_WEBAPP_URL, {
                 method: 'POST',
-                headers: { 'Content-Type': 'text/plain' },
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ data: rawDataArray })
             })
-            .then(response => response.json())
-            .then(result => console.log("Database response:", result))
-            .catch(error => console.error("Database error:", error));
+            .then(function(res) { return res.json(); })
+            .then(function(res) {
+                if (res.success) showToast("Database Google Sheet berhasil diperbarui!");
+            })
+            .catch(function(err) { console.error("GAS Error:", err); });
         }
 
         function showToast(msg) {
@@ -553,7 +528,7 @@
             document.getElementById('toastMsg').innerText = msg;
             toast.classList.remove('opacity-0');
             toast.classList.add('opacity-100', 'bottom-16');
-            setTimeout(() => {
+            setTimeout(function() {
                 toast.classList.remove('opacity-100', 'bottom-16');
                 toast.classList.add('opacity-0');
             }, 3000);
