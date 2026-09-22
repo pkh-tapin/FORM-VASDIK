@@ -28,6 +28,7 @@
         .office-table { border: 2px solid #000; }
         .office-table th, .office-table td { border: 1px solid #000 !important; color: #000 !important; padding: 6px 8px !important; font-size: 11px; }
         .office-table thead th { background-color: #f3f4f6 !important; font-weight: bold; text-align: center; vertical-align: middle; }
+        .qris-img { image-rendering: crisp-edges; image-rendering: -webkit-optimize-contrast; }
     </style>
 </head>
 <body class="text-gray-900 font-sans">
@@ -166,10 +167,11 @@
                 <div class="p-3 bg-amber-100 text-amber-800 rounded-full">
                     <i data-lucide="heart" class="w-6 h-6 fill-amber-500 text-amber-500"></i>
                 </div>
-                <h3 class="font-black text-indigo-950 uppercase tracking-tight text-base">Aplikasi Ini Gratis </h3>
+                <h3 class="font-black text-indigo-950 uppercase tracking-tight text-base">Aplikasi Ini Gratis & Sukarela</h3>
                 <p id="qrisBannerText" class="text-xs text-gray-600 max-w-2xl leading-relaxed">
                     Aplikasi E-Auto Form Fasdik ini disediakan 100% gratis tanpa biaya. Bagi Anda yang merasa terbantu dan ingin memberikan apresiasi atau donasi sukarela untuk keberlanjutan pengembangan aplikasi ini, silakan scan kode QRIS kami.
                 </p>
+                <p id="qrisAccountNameFooter" class="text-xs font-black text-indigo-900 bg-amber-200/60 px-3 py-1 rounded-full hidden border border-amber-300"></p>
                 <button onclick="openQrisModal()" class="mt-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold rounded-xl text-xs uppercase tracking-widest shadow-md flex items-center gap-2 transition-transform transform hover:scale-105">
                     <i data-lucide="qr-code" class="w-4 h-4"></i> Tampilkan QRIS Donasi
                 </button>
@@ -189,11 +191,14 @@
                 </button>
             </div>
             
-            <div id="qrisImageContainer" class="my-4 p-4 bg-gray-50 rounded-2xl border flex items-center justify-center min-h-[200px]">
+            <!-- OPTIMASI SCANNING BANK: Background Putih Bersih & Margin Cukup -->
+            <div id="qrisImageContainer" class="my-3 p-4 bg-white rounded-2xl border-2 border-gray-100 flex flex-col items-center justify-center min-h-[220px] shadow-inner">
                 <p class="text-xs text-gray-400">QRIS Belum Diunggah oleh Admin</p>
             </div>
 
-            <p id="qrisModalText" class="text-xs text-gray-600 leading-relaxed mb-6 font-medium">
+            <p id="qrisAccountNameModal" class="text-xs font-black text-indigo-950 uppercase tracking-wide mb-3 bg-indigo-50 py-1.5 px-3 rounded-lg border border-indigo-100 hidden"></p>
+
+            <p id="qrisModalText" class="text-xs text-gray-600 leading-relaxed mb-5 font-medium">
                 Terima kasih atas apresiasi dan dukungan sukarela Anda!
             </p>
 
@@ -223,7 +228,7 @@
 
     <!-- MODAL PENGATURAN ADMIN -->
     <div id="adminSettingsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-indigo-100">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-indigo-100 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
                 <h3 class="font-black text-indigo-950 uppercase text-sm flex items-center gap-2">
                     <i data-lucide="settings" class="w-5 h-5 text-indigo-600"></i> Pengaturan Admin (QRIS & Teks)
@@ -237,11 +242,17 @@
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Unggah Gambar Kode QRIS:</label>
                     <input type="file" id="qrisFileInput" accept="image/*" class="text-xs text-gray-500 w-full file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                    <p class="text-[10px] text-gray-400 mt-1">*Pastikan gambar QRIS terang, jelas, dan tidak terpotong agar mudah dibaca bank.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Atas Nama (A.N. Pemilik QRIS):</label>
+                    <input type="text" id="qrisAccountNameInput" class="w-full text-xs p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none font-bold" placeholder="Contoh: A.N. DINSOS / ZAEN SYACHRULLAH">
                 </div>
 
                 <div>
                     <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Kata-kata / Pesan Donasi Sukarela:</label>
-                    <textarea id="qrisTextarea" rows="4" class="w-full text-xs p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none leading-relaxed" placeholder="Tuliskan kata-kata apresiasi..."></textarea>
+                    <textarea id="qrisTextarea" rows="3" class="w-full text-xs p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none leading-relaxed" placeholder="Tuliskan kata-kata apresiasi..."></textarea>
                 </div>
             </div>
 
@@ -323,13 +334,31 @@
 
         function loadQrisSettings() {
             const savedText = localStorage.getItem('qris_custom_text') || DEFAULT_DONATION_TEXT;
+            const savedAccountName = localStorage.getItem('qris_account_name') || "";
+            
             document.getElementById('qrisBannerText').innerText = savedText;
             document.getElementById('qrisModalText').innerText = savedText;
             
+            const footerAccountName = document.getElementById('qrisAccountNameFooter');
+            const modalAccountName = document.getElementById('qrisAccountNameModal');
+
+            if (savedAccountName) {
+                footerAccountName.innerText = "A.N. " + savedAccountName.toUpperCase();
+                footerAccountName.classList.remove('hidden');
+
+                modalAccountName.innerText = "A.N. " + savedAccountName.toUpperCase();
+                modalAccountName.classList.remove('hidden');
+            } else {
+                footerAccountName.classList.add('hidden');
+                modalAccountName.classList.add('hidden');
+            }
+
             const savedImg = localStorage.getItem('qris_image_data');
             const imgContainer = document.getElementById('qrisImageContainer');
+            
             if (savedImg) {
-                imgContainer.innerHTML = '<img src="' + savedImg + '" alt="QRIS Donasi" class="max-h-64 object-contain mx-auto rounded-xl shadow-md border">';
+                // Gambar dibungkus rapi dengan Quiet Zone putih agar scanner M-Banking/E-Wallet 100% terbaca
+                imgContainer.innerHTML = '<img src="' + savedImg + '" alt="QRIS Donasi" class="qris-img max-w-[260px] w-full h-auto object-contain mx-auto rounded-xl p-2 bg-white shadow-sm border border-gray-200">';
             } else {
                 imgContainer.innerHTML = '<p class="text-xs text-gray-400">QRIS Belum Diunggah oleh Admin</p>';
             }
@@ -864,6 +893,7 @@
             doc.save("Gabungan_Laporan_Verifikasi.pdf");
         }
 
+        // SIMPAN DATA KELAS / LAPORAN KE GOOGLE SHEET
         async function saveToSheet(rawDataArray, fileCount) {
             if (!GAS_WEBAPP_URL) return;
             
@@ -871,12 +901,18 @@
                 const response = await fetch(GAS_WEBAPP_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ data: rawDataArray, fileCount: fileCount })
+                    body: JSON.stringify({ 
+                        action: "saveData", 
+                        data: rawDataArray, 
+                        fileCount: fileCount 
+                    })
                 });
                 const res = await response.json();
                 if (res.success) {
                     showToast("Database & Riwayat berhasil diperbarui!");
                     fetchGlobalStats(); 
+                } else {
+                    console.error("Gagal simpan ke sheet:", res.message);
                 }
             } catch (err) {
                 console.error("GAS Error:", err);
@@ -932,6 +968,7 @@
 
         function openAdminSettingsModal() {
             document.getElementById('qrisTextarea').value = localStorage.getItem('qris_custom_text') || DEFAULT_DONATION_TEXT;
+            document.getElementById('qrisAccountNameInput').value = localStorage.getItem('qris_account_name') || "";
             document.getElementById('adminSettingsModal').classList.remove('hidden');
         }
 
@@ -941,9 +978,10 @@
 
         function saveAdminSettings() {
             const customText = document.getElementById('qrisTextarea').value.trim();
-            if (customText) {
-                localStorage.setItem('qris_custom_text', customText);
-            }
+            const accountName = document.getElementById('qrisAccountNameInput').value.trim();
+
+            if (customText) localStorage.setItem('qris_custom_text', customText);
+            localStorage.setItem('qris_account_name', accountName);
 
             const fileInput = document.getElementById('qrisFileInput');
             if (fileInput.files && fileInput.files[0]) {
