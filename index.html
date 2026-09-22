@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dashboard Verifikasi Komitmen</title>
+    <title>E-Auto Form Fasdik</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
@@ -33,12 +33,26 @@
 </head>
 <body class="text-gray-900 font-sans">
 
+    <!-- NAVBAR -->
     <nav class="glass-panel sticky top-0 z-40 border-b border-white/50">
         <div class="max-w-full mx-auto px-4 md:px-6">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center gap-3 bg-gradient-to-r from-purple-700 to-indigo-700 text-transparent bg-clip-text">
-                    <i data-lucide="printer" class="w-6 h-6 text-indigo-700"></i>
-                    <span class="font-black text-lg md:text-2xl tracking-tighter uppercase">E-Verifikasi 3D</span>
+                    <i data-lucide="file-check-2" class="w-7 h-7 text-indigo-700"></i>
+                    <span class="font-black text-lg md:text-2xl tracking-tighter uppercase">E-Auto Form Fasdik</span>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <!-- Tombol QRIS Donasi -->
+                    <button onclick="openQrisModal()" class="px-3 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-md flex items-center gap-2 transition-all transform hover:scale-105">
+                        <i data-lucide="qr-code" class="w-4 h-4"></i>
+                        <span class="hidden md:inline">Donasi QRIS</span>
+                    </button>
+
+                    <!-- Tombol Admin (Gembok) -->
+                    <button onclick="openAdminAuthModal()" class="p-2.5 bg-indigo-900 hover:bg-black text-white rounded-xl shadow-md transition-all flex items-center justify-center" title="Pengaturan Admin">
+                        <i data-lucide="lock" class="w-4 h-4 text-amber-400"></i>
+                    </button>
                 </div>
             </div>
         </div>
@@ -46,6 +60,30 @@
 
     <main class="max-w-full mx-auto px-4 md:px-6 py-6 md:py-8">
         
+        <!-- COUNTER STATISTIK / TOTAL FILE -->
+        <div id="statsContainer" class="hidden mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="glass-panel p-4 rounded-2xl flex items-center gap-4 border-l-4 border-indigo-600">
+                <div class="p-3 bg-indigo-100 text-indigo-700 rounded-xl">
+                    <i data-lucide="files" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Laporan / Sekolah</p>
+                    <h4 id="statTotalLaporan" class="text-2xl font-black text-indigo-950">0</h4>
+                </div>
+            </div>
+            
+            <div class="glass-panel p-4 rounded-2xl flex items-center gap-4 border-l-4 border-purple-600">
+                <div class="p-3 bg-purple-100 text-purple-700 rounded-xl">
+                    <i data-lucide="users" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Baris Data Dirapikan</p>
+                    <h4 id="statTotalBaris" class="text-2xl font-black text-purple-950">0</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- FORM INPUT FILE -->
         <div class="glass-panel rounded-2xl p-5 md:p-8 mb-8 no-print transition-all">
             <h2 class="text-xl font-black mb-6 text-indigo-900 flex items-center gap-2 uppercase border-b-2 border-indigo-200 pb-3">
                 <i data-lucide="file-up" class="w-6 h-6"></i>
@@ -84,6 +122,7 @@
             </div>
         </div>
 
+        <!-- GLOBAL ACTION CONTAINER -->
         <div id="globalActionContainer" class="mb-8 hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <button onclick="downloadAllIndividualPDFs()" class="glass-panel w-full px-4 py-4 !bg-red-500/10 hover:!bg-red-500/20 !border-red-500/30 text-red-700 font-black rounded-xl shadow-lg flex items-center justify-center gap-2 uppercase tracking-tighter text-xs transition-all">
                 <i data-lucide="download" class="w-4 h-4"></i> PDF Terpisah
@@ -102,6 +141,101 @@
         <div id="resultContainer" class="space-y-12"></div>
     </main>
 
+    <!-- BANNER DONASI SUKARELA DI FOOTER -->
+    <footer class="max-w-full mx-auto px-4 md:px-6 my-8">
+        <div class="glass-panel rounded-2xl p-6 text-center border border-amber-200 bg-amber-50/40">
+            <div class="flex flex-col items-center justify-center gap-3">
+                <div class="p-3 bg-amber-100 text-amber-800 rounded-full">
+                    <i data-lucide="heart" class="w-6 h-6 fill-amber-500 text-amber-500"></i>
+                </div>
+                <h3 class="font-black text-indigo-950 uppercase tracking-tight text-base">Aplikasi Ini Gratis & Sukarela</h3>
+                <p id="qrisBannerText" class="text-xs text-gray-600 max-w-2xl leading-relaxed">
+                    Aplikasi E-Auto Form Fasdik ini disediakan 100% gratis tanpa biaya. Bagi Anda yang merasa terbantu dan ingin memberikan apresiasi atau donasi sukarela untuk keberlanjutan pengembangan aplikasi ini, silakan scan kode QRIS kami.
+                </p>
+                <button onclick="openQrisModal()" class="mt-2 px-5 py-2.5 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold rounded-xl text-xs uppercase tracking-widest shadow-md flex items-center gap-2 transition-transform transform hover:scale-105">
+                    <i data-lucide="qr-code" class="w-4 h-4"></i> Tampilkan QRIS Donasi
+                </button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODAL QRIS DONASI -->
+    <div id="qrisModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl transform transition-all border border-amber-200">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="font-black text-gray-900 uppercase text-sm tracking-wide flex items-center gap-2">
+                    <i data-lucide="qr-code" class="w-5 h-5 text-amber-500"></i> Donasi Sukarela (QRIS)
+                </h3>
+                <button onclick="closeQrisModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            
+            <div id="qrisImageContainer" class="my-4 p-4 bg-gray-50 rounded-2xl border flex items-center justify-center min-h-[200px]">
+                <!-- Gambar QRIS diisi via JavaScript -->
+                <p class="text-xs text-gray-400">QRIS Belum Diunggah oleh Admin</p>
+            </div>
+
+            <p id="qrisModalText" class="text-xs text-gray-600 leading-relaxed mb-6 font-medium">
+                Terima kasih atas apresiasi dan dukungan sukarela Anda!
+            </p>
+
+            <button onclick="closeQrisModal()" class="w-full py-3 bg-gray-900 hover:bg-black text-white text-xs font-bold uppercase rounded-xl tracking-widest">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL AUTH ADMIN (PIN LOCK) -->
+    <div id="adminAuthModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 max-w-xs w-full text-center shadow-2xl border border-indigo-100">
+            <div class="w-12 h-12 bg-indigo-100 text-indigo-800 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i data-lucide="lock" class="w-6 h-6"></i>
+            </div>
+            <h3 class="font-black text-indigo-950 uppercase text-sm mb-1">Akses Admin</h3>
+            <p class="text-[11px] text-gray-500 mb-4">Masukkan PIN Admin untuk mengatur QRIS & Kata-kata.</p>
+            
+            <input type="password" id="adminPinInput" placeholder="Masukkan PIN" class="w-full text-center tracking-widest text-lg font-bold py-2 px-4 border rounded-xl mb-4 focus:ring-2 focus:ring-indigo-500 outline-none">
+            
+            <div class="flex gap-2">
+                <button onclick="closeAdminAuthModal()" class="w-1/2 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold rounded-xl uppercase">Batal</button>
+                <button onclick="verifyAdminPin()" class="w-1/2 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl uppercase">Masuk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL PENGATURAN ADMIN (SETTING QRIS & TEXT) -->
+    <div id="adminSettingsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-indigo-100">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="font-black text-indigo-950 uppercase text-sm flex items-center gap-2">
+                    <i data-lucide="settings" class="w-5 h-5 text-indigo-600"></i> Pengaturan Admin (QRIS & Teks)
+                </h3>
+                <button onclick="closeAdminSettingsModal()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Unggah Gambar Kode QRIS:</label>
+                    <input type="file" id="qrisFileInput" accept="image/*" class="text-xs text-gray-500 w-full file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Kata-kata / Pesan Donasi Sukarela:</label>
+                    <textarea id="qrisTextarea" rows="4" class="w-full text-xs p-3 border rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none leading-relaxed" placeholder="Tuliskan kata-kata apresiasi..."></textarea>
+                </div>
+            </div>
+
+            <div class="mt-6 flex gap-2">
+                <button onclick="closeAdminSettingsModal()" class="w-1/2 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 text-xs font-bold rounded-xl uppercase tracking-wider">Batal</button>
+                <button onclick="saveAdminSettings()" class="w-1/2 py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl uppercase tracking-wider shadow-md">Simpan Pengaturan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 transition-all duration-500 opacity-0 bg-gray-900/90 backdrop-blur-md text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-4 z-50 pointer-events-none text-xs border border-white/10">
         <i data-lucide="check-circle" class="w-4 h-4 text-green-400"></i>
         <span id="toastMsg" class="font-bold uppercase tracking-widest">Pesan</span>
@@ -115,12 +249,35 @@
         let processedDatasets = [];
         let rawDataForDB = []; 
 
+        const DEFAULT_DONATION_TEXT = "Aplikasi E-Auto Form Fasdik ini disediakan 100% gratis tanpa biaya. Bagi Anda yang merasa terbantu dan ingin memberikan apresiasi atau donasi sukarela untuk keberlanjutan pengembangan aplikasi ini, silakan scan kode QRIS di bawah ini. Terima kasih atas dukungannya!";
+        const ADMIN_PIN = "123456";
+
         const fileInput = document.getElementById('fileInput');
         const fileList = document.getElementById('fileList');
         const actionButtons = document.getElementById('actionButtons');
         const processBtn = document.getElementById('processBtn');
         const resultContainer = document.getElementById('resultContainer');
         const globalActionContainer = document.getElementById('globalActionContainer');
+        const statsContainer = document.getElementById('statsContainer');
+
+        // INISIALISASI SETTING QRIS & TEKS DARI LOCALSTORAGE
+        window.addEventListener('DOMContentLoaded', function() {
+            loadQrisSettings();
+        });
+
+        function loadQrisSettings() {
+            const savedText = localStorage.getItem('qris_custom_text') || DEFAULT_DONATION_TEXT;
+            document.getElementById('qrisBannerText').innerText = savedText;
+            document.getElementById('qrisModalText').innerText = savedText;
+            
+            const savedImg = localStorage.getItem('qris_image_data');
+            const imgContainer = document.getElementById('qrisImageContainer');
+            if (savedImg) {
+                imgContainer.innerHTML = '<img src="' + savedImg + '" alt="QRIS Donasi" class="max-h-64 object-contain mx-auto rounded-xl shadow-md border">';
+            } else {
+                imgContainer.innerHTML = '<p class="text-xs text-gray-400">QRIS Belum Diunggah oleh Admin</p>';
+            }
+        }
 
         fileInput.addEventListener('change', function(e) {
             fileList.innerHTML = '';
@@ -150,6 +307,8 @@
             processBtn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Memproses...';
             lucide.createIcons();
 
+            let totalRowsCount = 0;
+
             for (let i = 0; i < files.length; i++) {
                 let text = "";
                 const file = files[i];
@@ -168,6 +327,7 @@
                 if (parseResult && parseResult.monthsData.length > 0) {
                     parseResult.monthsData.forEach(function(monthData) {
                         processedDatasets.push(monthData);
+                        totalRowsCount += monthData.data.length;
                         renderTable(monthData, processedDatasets.length - 1);
                     });
                     rawDataForDB.push(parseResult.rawDatabaseData);
@@ -177,6 +337,11 @@
             if (rawDataForDB.length > 0) {
                 saveToSheet(rawDataForDB);
             }
+
+            // Update Counter
+            document.getElementById('statTotalLaporan').innerText = processedDatasets.length;
+            document.getElementById('statTotalBaris').innerText = totalRowsCount;
+            statsContainer.classList.remove('hidden');
 
             processBtn.disabled = false;
             processBtn.innerHTML = '<i data-lucide="cpu" class="w-5 h-5"></i> Proses Laporan Otomatis';
@@ -321,11 +486,10 @@
             lucide.createIcons();
         }
 
-        // GENERATE PDF LANDSCAPE F4 DENGAN JUDUL CENTER
+        // GENERATE PDF LANDSCAPE F4
         function drawPDFContent(doc, data) {
-            const pageW = doc.internal.pageSize.getWidth(); // 330.2 mm
+            const pageW = doc.internal.pageSize.getWidth();
             
-            // Judul Tengah
             doc.setFont("helvetica", "bold");
             doc.setFontSize(13);
             doc.setTextColor(0, 0, 0);
@@ -334,7 +498,6 @@
             doc.setFontSize(10);
             doc.text("PERIODE: " + data.monthName + " " + data.year, pageW / 2, 20, { align: "center" });
             
-            // Info Sekolah Rata Kiri
             doc.setFontSize(9);
             doc.setFont("helvetica", "normal");
             doc.text("NPSN          : " + data.npsn, 10, 27);
@@ -403,7 +566,7 @@
             doc.text("........................................................", signX - 10, finalY + 28);
         }
 
-        // GENERATE EXCEL RAPI BERBORDER HITAM DAN JUDUL CENTER
+        // GENERATE EXCEL RAPI BERBORDER HITAM
         function createStyledExcelSheet(data) {
             const borderThin = {
                 top: { style: "thin", color: { rgb: "000000" } },
@@ -415,18 +578,9 @@
             const fontHeader = { name: "Arial", sz: 9, bold: true, color: { rgb: "000000" } };
             const fontData = { name: "Arial", sz: 9, color: { rgb: "000000" } };
 
-            const styleTitleMain = {
-                font: { name: "Arial", sz: 14, bold: true },
-                alignment: { horizontal: "center", vertical: "center" }
-            };
-            const styleTitleSub = {
-                font: { name: "Arial", sz: 11, bold: true },
-                alignment: { horizontal: "center", vertical: "center" }
-            };
-            const styleInfo = {
-                font: { name: "Arial", sz: 10, bold: true },
-                alignment: { horizontal: "left", vertical: "center" }
-            };
+            const styleTitleMain = { font: { name: "Arial", sz: 14, bold: true }, alignment: { horizontal: "center", vertical: "center" } };
+            const styleTitleSub = { font: { name: "Arial", sz: 11, bold: true }, alignment: { horizontal: "center", vertical: "center" } };
+            const styleInfo = { font: { name: "Arial", sz: 10, bold: true }, alignment: { horizontal: "left", vertical: "center" } };
 
             const styleHeaderCell = {
                 font: fontHeader,
@@ -442,86 +596,43 @@
                 alignment: { horizontal: "center", vertical: "center" }
             };
 
-            const styleDataCenter = {
-                font: fontData,
-                border: borderThin,
-                alignment: { horizontal: "center", vertical: "center" }
-            };
-
-            const styleDataLeft = {
-                font: fontData,
-                border: borderThin,
-                alignment: { horizontal: "left", vertical: "center" }
-            };
+            const styleDataCenter = { font: fontData, border: borderThin, alignment: { horizontal: "center", vertical: "center" } };
+            const styleDataLeft = { font: fontData, border: borderThin, alignment: { horizontal: "left", vertical: "center" } };
 
             let wsData = [];
 
-            // Row 0 & 1: Judul Center
             wsData.push([{ v: "FORM VERIFIKASI KOMITMEN PENDIDIKAN", s: styleTitleMain }]);
             wsData.push([{ v: "PERIODE: " + data.monthName + " " + data.year, s: styleTitleSub }]);
             wsData.push([]);
             
-            // Info Sekolah
             wsData.push([{ v: "NPSN          : " + data.npsn, s: styleInfo }]);
             wsData.push([{ v: "NAMA SEKOLAH : " + data.schoolName, s: styleInfo }]);
             wsData.push([]);
 
-            // Header Tabel
             wsData.push([
-                { v: "NO", s: styleHeaderCell },
-                { v: "NIK PENGURUS", s: styleHeaderCell },
-                { v: "NAMA PENGURUS", s: styleHeaderCell },
-                { v: "NIK SISWA", s: styleHeaderCell },
-                { v: "NISN", s: styleHeaderCell },
-                { v: "NAMA SISWA", s: styleHeaderCell },
-                { v: "BENTUK", s: styleHeaderCell },
-                { v: "TINGKAT", s: styleHeaderCell },
-                { v: data.monthName, s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "KET", s: styleHeaderCell },
-                { v: "PENDAMPING", s: styleHeaderCell }
+                { v: "NO", s: styleHeaderCell }, { v: "NIK PENGURUS", s: styleHeaderCell }, { v: "NAMA PENGURUS", s: styleHeaderCell },
+                { v: "NIK SISWA", s: styleHeaderCell }, { v: "NISN", s: styleHeaderCell }, { v: "NAMA SISWA", s: styleHeaderCell },
+                { v: "BENTUK", s: styleHeaderCell }, { v: "TINGKAT", s: styleHeaderCell }, { v: data.monthName, s: styleHeaderCell },
+                { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell }, { v: "KET", s: styleHeaderCell }, { v: "PENDAMPING", s: styleHeaderCell }
             ]);
 
             wsData.push([
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "Hari Efektif: .............", s: styleHeaderSub },
-                { v: "", s: styleHeaderSub },
-                { v: "", s: styleHeaderSub },
-                { v: "", s: styleHeaderSub },
-                { v: "", s: styleHeaderSub },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell }
+                { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "Hari Efektif: .............", s: styleHeaderSub },
+                { v: "", s: styleHeaderSub }, { v: "", s: styleHeaderSub }, { v: "", s: styleHeaderSub },
+                { v: "", s: styleHeaderSub }, { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }
             ]);
 
             wsData.push([
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "A", s: styleHeaderCell },
-                { v: "I", s: styleHeaderCell },
-                { v: "S", s: styleHeaderCell },
-                { v: "JML", s: styleHeaderCell },
-                { v: "%", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell }
+                { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "A", s: styleHeaderCell },
+                { v: "I", s: styleHeaderCell }, { v: "S", s: styleHeaderCell }, { v: "JML", s: styleHeaderCell },
+                { v: "%", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }
             ]);
 
-            // Baris Data dengan Border Hitam
             data.data.forEach(function(row) {
                 let rowCells = [];
                 for (let cIdx = 0; cIdx < 15; cIdx++) {
@@ -532,7 +643,6 @@
                 wsData.push(rowCells);
             });
 
-            // Tanda Tangan
             wsData.push([]);
             wsData.push([]);
             
@@ -555,10 +665,9 @@
 
             const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-            // Merge Sel untuk Judul dan Header
             ws['!merges'] = [
-                { s: { r: 0, c: 0 }, e: { r: 0, c: 14 } }, // Judul Utama Center
-                { s: { r: 1, c: 0 }, e: { r: 1, c: 14 } }, // Periode Center
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 14 } },
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 14 } },
                 { s: { r: 6, c: 0 }, e: { r: 8, c: 0 } },
                 { s: { r: 6, c: 1 }, e: { r: 8, c: 1 } },
                 { s: { r: 6, c: 2 }, e: { r: 8, c: 2 } },
@@ -576,14 +685,12 @@
                 { s: { r: wsData.length - 1, c: 11 }, e: { r: wsData.length - 1, c: 14 } }
             ];
 
-            // Lebar Kolom
             ws['!cols'] = [
                 { wch: 5 }, { wch: 20 }, { wch: 26 }, { wch: 20 }, { wch: 16 },
                 { wch: 26 }, { wch: 10 }, { wch: 12 }, { wch: 5 }, { wch: 5 },
                 { wch: 5 }, { wch: 6 }, { wch: 7 }, { wch: 12 }, { wch: 22 }
             ];
 
-            // Setup Cetak Kertas F4 / Folio Landscape Excel
             ws['!pageSetup'] = {
                 paperSize: 14,
                 orientation: 'landscape',
@@ -622,7 +729,7 @@
 
         function downloadSinglePDF(index) {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]); // Ukuran F4
+            const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]); 
             const data = processedDatasets[index];
             drawPDFContent(doc, data);
             doc.save(data.schoolName + "_" + data.monthName + "_" + data.year + ".pdf");
@@ -638,7 +745,7 @@
 
         function downloadAllMergedPDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]); // Ukuran F4
+            const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]); 
             processedDatasets.forEach(function(data, i) {
                 if (i > 0) doc.addPage();
                 drawPDFContent(doc, data);
@@ -659,6 +766,66 @@
                 if (res.success) showToast("Database Google Sheet berhasil diperbarui!");
             })
             .catch(function(err) { console.error("GAS Error:", err); });
+        }
+
+        // FUNGSI MODAL QRIS & ADMIN
+        function openQrisModal() {
+            document.getElementById('qrisModal').classList.remove('hidden');
+        }
+
+        function closeQrisModal() {
+            document.getElementById('qrisModal').classList.add('hidden');
+        }
+
+        function openAdminAuthModal() {
+            document.getElementById('adminPinInput').value = '';
+            document.getElementById('adminAuthModal').classList.remove('hidden');
+        }
+
+        function closeAdminAuthModal() {
+            document.getElementById('adminAuthModal').classList.add('hidden');
+        }
+
+        function verifyAdminPin() {
+            const pin = document.getElementById('adminPinInput').value;
+            if (pin === ADMIN_PIN) {
+                closeAdminAuthModal();
+                openAdminSettingsModal();
+            } else {
+                showToast("PIN Admin Salah!");
+            }
+        }
+
+        function openAdminSettingsModal() {
+            document.getElementById('qrisTextarea').value = localStorage.getItem('qris_custom_text') || DEFAULT_DONATION_TEXT;
+            document.getElementById('adminSettingsModal').classList.remove('hidden');
+        }
+
+        function closeAdminSettingsModal() {
+            document.getElementById('adminSettingsModal').classList.add('hidden');
+        }
+
+        function saveAdminSettings() {
+            const customText = document.getElementById('qrisTextarea').value.trim();
+            if (customText) {
+                localStorage.setItem('qris_custom_text', customText);
+            }
+
+            const fileInput = document.getElementById('qrisFileInput');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    localStorage.setItem('qris_image_data', e.target.result);
+                    loadQrisSettings();
+                    closeAdminSettingsModal();
+                    showToast("Pengaturan Admin Berhasil Disimpan!");
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else {
+                loadQrisSettings();
+                closeAdminSettingsModal();
+                showToast("Pengaturan Admin Berhasil Disimpan!");
+            }
         }
 
         function showToast(msg) {
