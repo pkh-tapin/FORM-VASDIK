@@ -57,15 +57,15 @@
 
     <main class="max-w-full mx-auto px-4 md:px-6 py-6 md:py-8">
         
-        <!-- COUNTER STATISTIK AKUMULASI GLOBAL (SEMUA PENGGUNA) -->
-        <div id="statsContainer" class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- COUNTER STATISTIK AKUMULASI GLOBAL & COUNTER FILE -->
+        <div id="statsContainer" class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="glass-panel p-4 rounded-2xl flex items-center gap-4 border-l-4 border-indigo-600">
                 <div class="p-3 bg-indigo-100 text-indigo-700 rounded-xl">
                     <i data-lucide="globe" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Laporan / Sekolah (Semua Pengguna)</p>
-                    <h4 id="statTotalLaporan" class="text-2xl font-black text-indigo-950">Loading...</h4>
+                    <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Laporan / Sekolah</p>
+                    <h4 id="statTotalLaporan" class="text-2xl font-black text-indigo-950">...</h4>
                 </div>
             </div>
             
@@ -74,9 +74,30 @@
                     <i data-lucide="database" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Baris Terproses (Semua Pengguna)</p>
-                    <h4 id="statTotalBaris" class="text-2xl font-black text-purple-950">Loading...</h4>
+                    <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Baris Terproses</p>
+                    <h4 id="statTotalBaris" class="text-2xl font-black text-purple-950">...</h4>
                 </div>
+            </div>
+
+            <div class="glass-panel p-4 rounded-2xl flex items-center gap-4 border-l-4 border-emerald-600">
+                <div class="p-3 bg-emerald-100 text-emerald-700 rounded-xl">
+                    <i data-lucide="file-check" class="w-6 h-6"></i>
+                </div>
+                <div>
+                    <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total File Diunggah</p>
+                    <h4 id="statTotalFiles" class="text-2xl font-black text-emerald-950">...</h4>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIWAYAT TRANSAKSI TERAKHIR -->
+        <div class="glass-panel rounded-2xl p-5 mb-8">
+            <h3 class="text-xs font-black uppercase text-indigo-900 flex items-center gap-2 mb-3">
+                <i data-lucide="history" class="w-4 h-4 text-indigo-600"></i>
+                Riwayat Pengunggahan Terakhir
+            </h3>
+            <div id="historyList" class="space-y-2 text-xs">
+                <p class="text-gray-400 italic">Memuat riwayat...</p>
             </div>
         </div>
 
@@ -253,14 +274,13 @@
         const processBtn = document.getElementById('processBtn');
         const resultContainer = document.getElementById('resultContainer');
         const globalActionContainer = document.getElementById('globalActionContainer');
-        const statsContainer = document.getElementById('statsContainer');
 
         window.addEventListener('DOMContentLoaded', function() {
             loadQrisSettings();
-            fetchGlobalStats(); // Otomatis Ambil Akumulasi Data dari Seluruh Pengguna
+            fetchGlobalStats(); 
         });
 
-        // AMBIL STATISTIK AKUMULASI DARI SERVER (GOOGLE SHEETS)
+        // AMBIL STATISTIK AKUMULASI GLOBAL & RIWAYAT DARI SERVER
         async function fetchGlobalStats() {
             if (!GAS_WEBAPP_URL) return;
             try {
@@ -273,10 +293,32 @@
                 if (res.success) {
                     document.getElementById('statTotalLaporan').innerText = res.totalLaporan;
                     document.getElementById('statTotalBaris').innerText = res.totalBaris;
+                    document.getElementById('statTotalFiles').innerText = res.totalFiles;
+
+                    renderHistoryList(res.history || []);
                 }
             } catch (err) {
                 console.error("Gagal mengambil statistik akumulasi global:", err);
             }
+        }
+
+        function renderHistoryList(historyData) {
+            const container = document.getElementById('historyList');
+            if (!historyData || historyData.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 italic">Belum ada riwayat pengunggahan.</p>';
+                return;
+            }
+
+            container.innerHTML = historyData.map(function(item) {
+                return '<div class="flex items-center justify-between border-b border-gray-100 pb-1.5 pt-1.5 hover:bg-white/40 px-2 rounded-lg transition-colors">' +
+                    '<div class="flex items-center gap-2">' +
+                        '<span class="text-[10px] font-bold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded">' + item.time + '</span>' +
+                        '<span class="font-black text-gray-800 uppercase">' + item.schoolName + '</span>' +
+                        '<span class="text-[10px] text-gray-500">(NPSN: ' + item.npsn + ')</span>' +
+                    '</div>' +
+                    '<span class="text-[10px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-100">' + item.months + '</span>' +
+                '</div>';
+            }).join('');
         }
 
         function loadQrisSettings() {
@@ -346,7 +388,7 @@
             }
 
             if (rawDataForDB.length > 0) {
-                await saveToSheet(rawDataForDB);
+                await saveToSheet(rawDataForDB, files.length);
             }
 
             processBtn.disabled = false;
@@ -492,7 +534,6 @@
             lucide.createIcons();
         }
 
-        // GENERATE PDF LANDSCAPE F4
         function drawPDFContent(doc, data) {
             const pageW = doc.internal.pageSize.getWidth();
             
@@ -573,7 +614,7 @@
         }
 
         // =========================================================================
-        // KUNCI PERBAIKAN EXCEL: SHIFT TO XML PAGE SETUP (LANDSCAPE, F4, FIT 1 PAGE WIDE)
+        // BLUEPRINT UTAMA: LOCK EXCEL LANDSCAPE & FIT 1 PAGE WIDE
         // =========================================================================
         function createStyledExcelSheet(data) {
             const borderThin = {
@@ -609,24 +650,20 @@
 
             let wsData = [];
 
-            // Baris 1: Judul Utama
             let r1 = Array(15).fill({ v: "", s: styleTitleMain });
             r1[0] = { v: "FORM VERIFIKASI KOMITMEN PENDIDIKAN", s: styleTitleMain };
             wsData.push(r1);
 
-            // Baris 2: Periode
             let r2 = Array(15).fill({ v: "", s: styleTitleSub });
             r2[0] = { v: "PERIODE: " + data.monthName + " " + data.year, s: styleTitleSub };
             wsData.push(r2);
 
             wsData.push([]); 
             
-            // Baris 4 & 5: Info Sekolah
             wsData.push([{ v: "NPSN          : " + data.npsn, s: styleInfo }]);
             wsData.push([{ v: "NAMA SEKOLAH : " + data.schoolName, s: styleInfo }]);
             wsData.push([]); 
 
-            // Baris 7: Header Utama
             wsData.push([
                 { v: "NO", s: styleHeaderCell },
                 { v: "NIK PENGURUS", s: styleHeaderCell },
@@ -645,7 +682,6 @@
                 { v: "PENDAMPING", s: styleHeaderCell }
             ]);
 
-            // Baris 8: Hari Efektif
             wsData.push([
                 { v: "", s: styleHeaderCell },
                 { v: "", s: styleHeaderCell },
@@ -664,7 +700,6 @@
                 { v: "", s: styleHeaderCell }
             ]);
 
-            // Baris 9: Sub-Header Absensi
             wsData.push([
                 { v: "", s: styleHeaderCell },
                 { v: "", s: styleHeaderCell },
@@ -683,7 +718,6 @@
                 { v: "", s: styleHeaderCell }
             ]);
 
-            // Baris Data
             data.data.forEach(function(row) {
                 let rowCells = [];
                 for (let cIdx = 0; cIdx < 15; cIdx++) {
@@ -694,7 +728,6 @@
                 wsData.push(rowCells);
             });
 
-            // Tanda Tangan
             wsData.push([]);
             wsData.push([]);
             
@@ -717,7 +750,6 @@
 
             const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-            // MERGE SEL
             ws['!merges'] = [
                 { s: { r: 0, c: 0 }, e: { r: 0, c: 14 } }, 
                 { s: { r: 1, c: 0 }, e: { r: 1, c: 14 } }, 
@@ -738,7 +770,6 @@
                 { s: { r: wsData.length - 1, c: 11 }, e: { r: wsData.length - 1, c: 14 } }
             ];
 
-            // LEBAR KOLOM EXCEL
             ws['!cols'] = [
                 { wch: 4.5 }, 
                 { wch: 17.5 },
@@ -757,20 +788,18 @@
                 { wch: 18 }   
             ];
 
-            // =========================================================
-            // BLUEPRINT UTAMA: PAKSA EXCEL UNTUK LOCK LANDSCAPE DENGAN FIT-TO-PAGE
-            // =========================================================
+            // PENGUNCIAN XML PAGE SETUP (WAJIB ADA AGAR PERINTAH CETAK EXCEL AUTO LANDSCAPE)
             ws['!sheetPr'] = {
                 pageSetUpPr: {
-                    fitToPage: true // WAJIB ADA agar Excel tidak mengabaikan PageSetup!
+                    fitToPage: true
                 }
             };
 
             ws['!pageSetup'] = {
-                paperSize: 14,            // 14 = Ukuran Kertas F4 / Folio
-                orientation: 'landscape', // Kunci Landscape
-                fitToWidth: 1,            // Lebar pas 1 halaman
-                fitToHeight: 0            // Tinggi fleksibel sesuai data
+                paperSize: 14,            // F4 / Folio
+                orientation: 'landscape', // Lock Landscape
+                fitToWidth: 1,            // Fit 1 Halaman Lebar
+                fitToHeight: 0            
             };
 
             ws['!printOptions'] = {
@@ -835,19 +864,19 @@
             doc.save("Gabungan_Laporan_Verifikasi.pdf");
         }
 
-        async function saveToSheet(rawDataArray) {
+        async function saveToSheet(rawDataArray, fileCount) {
             if (!GAS_WEBAPP_URL) return;
             
             try {
                 const response = await fetch(GAS_WEBAPP_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ data: rawDataArray })
+                    body: JSON.stringify({ data: rawDataArray, fileCount: fileCount })
                 });
                 const res = await response.json();
                 if (res.success) {
-                    showToast("Database Google Sheet berhasil diperbarui!");
-                    fetchGlobalStats(); // Perbarui counter akumulasi global
+                    showToast("Database & Riwayat berhasil diperbarui!");
+                    fetchGlobalStats(); 
                 }
             } catch (err) {
                 console.error("GAS Error:", err);
