@@ -106,8 +106,8 @@
                     <h3 class="font-black text-sm mb-3 uppercase border-b border-indigo-200 pb-2 text-indigo-900">Spesifikasi Cetak:</h3>
                     <ul class="space-y-2 text-[11px] md:text-xs text-gray-800 font-medium leading-relaxed">
                         <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Judul Tengah & Format F4 Landscape.</span></li>
-                        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Hasil Excel Berborder Hitam Rapi Sesuai PDF.</span></li>
-                        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Sistem Otomatis Pemisah Multi-Bulan.</span></li>
+                        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Hasil Excel Presisi 100% Sama Sesuai PDF.</span></li>
+                        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Excel Auto Page-Setup F4 Ready-to-Print.</span></li>
                     </ul>
                 </div>
             </div>
@@ -172,7 +172,6 @@
             </div>
             
             <div id="qrisImageContainer" class="my-4 p-4 bg-gray-50 rounded-2xl border flex items-center justify-center min-h-[200px]">
-                <!-- Gambar QRIS diisi via JavaScript -->
                 <p class="text-xs text-gray-400">QRIS Belum Diunggah oleh Admin</p>
             </div>
 
@@ -260,7 +259,6 @@
         const globalActionContainer = document.getElementById('globalActionContainer');
         const statsContainer = document.getElementById('statsContainer');
 
-        // INISIALISASI SETTING QRIS & TEKS DARI LOCALSTORAGE
         window.addEventListener('DOMContentLoaded', function() {
             loadQrisSettings();
         });
@@ -338,7 +336,6 @@
                 saveToSheet(rawDataForDB);
             }
 
-            // Update Counter
             document.getElementById('statTotalLaporan').innerText = processedDatasets.length;
             document.getElementById('statTotalBaris').innerText = totalRowsCount;
             statsContainer.classList.remove('hidden');
@@ -486,7 +483,7 @@
             lucide.createIcons();
         }
 
-        // GENERATE PDF LANDSCAPE F4
+        // GENERATE PDF LANDSCAPE F4 (330.2mm x 215.9mm)
         function drawPDFContent(doc, data) {
             const pageW = doc.internal.pageSize.getWidth();
             
@@ -566,7 +563,7 @@
             doc.text("........................................................", signX - 10, finalY + 28);
         }
 
-        // GENERATE EXCEL RAPI BERBORDER HITAM
+        // GENERATE EXCEL RAPI BORDER HITAM PRESISI 1:1 SAMA DENGAN PDF & F4 LANDSCAPE PRINT-READY
         function createStyledExcelSheet(data) {
             const borderThin = {
                 top: { style: "thin", color: { rgb: "000000" } },
@@ -578,9 +575,9 @@
             const fontHeader = { name: "Arial", sz: 9, bold: true, color: { rgb: "000000" } };
             const fontData = { name: "Arial", sz: 9, color: { rgb: "000000" } };
 
-            const styleTitleMain = { font: { name: "Arial", sz: 14, bold: true }, alignment: { horizontal: "center", vertical: "center" } };
-            const styleTitleSub = { font: { name: "Arial", sz: 11, bold: true }, alignment: { horizontal: "center", vertical: "center" } };
-            const styleInfo = { font: { name: "Arial", sz: 10, bold: true }, alignment: { horizontal: "left", vertical: "center" } };
+            const styleTitleMain = { font: { name: "Arial", sz: 13, bold: true }, alignment: { horizontal: "center", vertical: "center" } };
+            const styleTitleSub = { font: { name: "Arial", sz: 10, bold: true }, alignment: { horizontal: "center", vertical: "center" } };
+            const styleInfo = { font: { name: "Arial", sz: 9, bold: true }, alignment: { horizontal: "left", vertical: "center" } };
 
             const styleHeaderCell = {
                 font: fontHeader,
@@ -601,38 +598,74 @@
 
             let wsData = [];
 
+            // Judul Rata Tengah
             wsData.push([{ v: "FORM VERIFIKASI KOMITMEN PENDIDIKAN", s: styleTitleMain }]);
             wsData.push([{ v: "PERIODE: " + data.monthName + " " + data.year, s: styleTitleSub }]);
             wsData.push([]);
             
+            // Info Sekolah Rata Kiri
             wsData.push([{ v: "NPSN          : " + data.npsn, s: styleInfo }]);
             wsData.push([{ v: "NAMA SEKOLAH : " + data.schoolName, s: styleInfo }]);
             wsData.push([]);
 
+            // Baris Header 1
             wsData.push([
-                { v: "NO", s: styleHeaderCell }, { v: "NIK PENGURUS", s: styleHeaderCell }, { v: "NAMA PENGURUS", s: styleHeaderCell },
-                { v: "NIK SISWA", s: styleHeaderCell }, { v: "NISN", s: styleHeaderCell }, { v: "NAMA SISWA", s: styleHeaderCell },
-                { v: "BENTUK", s: styleHeaderCell }, { v: "TINGKAT", s: styleHeaderCell }, { v: data.monthName, s: styleHeaderCell },
-                { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell }, { v: "KET", s: styleHeaderCell }, { v: "PENDAMPING", s: styleHeaderCell }
+                { v: "NO", s: styleHeaderCell },
+                { v: "NIK PENGURUS", s: styleHeaderCell },
+                { v: "NAMA PENGURUS", s: styleHeaderCell },
+                { v: "NIK SISWA", s: styleHeaderCell },
+                { v: "NISN", s: styleHeaderCell },
+                { v: "NAMA SISWA", s: styleHeaderCell },
+                { v: "BENTUK", s: styleHeaderCell },
+                { v: "TINGKAT", s: styleHeaderCell },
+                { v: data.monthName, s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "KET", s: styleHeaderCell },
+                { v: "PENDAMPING", s: styleHeaderCell }
             ]);
 
+            // Baris Header 2 (Hari Efektif)
             wsData.push([
-                { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "Hari Efektif: .............", s: styleHeaderSub },
-                { v: "", s: styleHeaderSub }, { v: "", s: styleHeaderSub }, { v: "", s: styleHeaderSub },
-                { v: "", s: styleHeaderSub }, { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "Hari Efektif: .............", s: styleHeaderSub },
+                { v: "", s: styleHeaderSub },
+                { v: "", s: styleHeaderSub },
+                { v: "", s: styleHeaderSub },
+                { v: "", s: styleHeaderSub },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell }
             ]);
 
+            // Baris Header 3 (Sub-kolom A, I, S, JML, %)
             wsData.push([
-                { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell },
-                { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "A", s: styleHeaderCell },
-                { v: "I", s: styleHeaderCell }, { v: "S", s: styleHeaderCell }, { v: "JML", s: styleHeaderCell },
-                { v: "%", s: styleHeaderCell }, { v: "", s: styleHeaderCell }, { v: "", s: styleHeaderCell }
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "A", s: styleHeaderCell },
+                { v: "I", s: styleHeaderCell },
+                { v: "S", s: styleHeaderCell },
+                { v: "JML", s: styleHeaderCell },
+                { v: "%", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell },
+                { v: "", s: styleHeaderCell }
             ]);
 
+            // Baris Data
             data.data.forEach(function(row) {
                 let rowCells = [];
                 for (let cIdx = 0; cIdx < 15; cIdx++) {
@@ -643,10 +676,11 @@
                 wsData.push(rowCells);
             });
 
+            // Tanda Tangan
             wsData.push([]);
             wsData.push([]);
             
-            const styleSign = { font: { name: "Arial", sz: 10 }, alignment: { horizontal: "center", vertical: "center" } };
+            const styleSign = { font: { name: "Arial", sz: 9.5 }, alignment: { horizontal: "center", vertical: "center" } };
             
             let signRow1 = Array(15).fill({ v: "" });
             signRow1[11] = { v: "TAPIN,                                                 " + data.year, s: styleSign };
@@ -665,9 +699,10 @@
 
             const ws = XLSX.utils.aoa_to_sheet(wsData);
 
+            // Penggabungan Sel (Merges)
             ws['!merges'] = [
-                { s: { r: 0, c: 0 }, e: { r: 0, c: 14 } },
-                { s: { r: 1, c: 0 }, e: { r: 1, c: 14 } },
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 14 } }, // Judul Utama Center
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 14 } }, // Periode Center
                 { s: { r: 6, c: 0 }, e: { r: 8, c: 0 } },
                 { s: { r: 6, c: 1 }, e: { r: 8, c: 1 } },
                 { s: { r: 6, c: 2 }, e: { r: 8, c: 2 } },
@@ -685,18 +720,38 @@
                 { s: { r: wsData.length - 1, c: 11 }, e: { r: wsData.length - 1, c: 14 } }
             ];
 
+            // Lebar Kolom Presisi agar Fit ke Kertas F4 Landscape
             ws['!cols'] = [
-                { wch: 5 }, { wch: 20 }, { wch: 26 }, { wch: 20 }, { wch: 16 },
-                { wch: 26 }, { wch: 10 }, { wch: 12 }, { wch: 5 }, { wch: 5 },
-                { wch: 5 }, { wch: 6 }, { wch: 7 }, { wch: 12 }, { wch: 22 }
+                { wch: 5 },  // NO
+                { wch: 19 }, // NIK PENGURUS
+                { wch: 25 }, // NAMA PENGURUS
+                { wch: 19 }, // NIK SISWA
+                { wch: 15 }, // NISN
+                { wch: 25 }, // NAMA SISWA
+                { wch: 9 },  // BENTUK
+                { wch: 10 }, // TINGKAT
+                { wch: 4 },  // A
+                { wch: 4 },  // I
+                { wch: 4 },  // S
+                { wch: 5 },  // JML
+                { wch: 6 },  // %
+                { wch: 10 }, // KET
+                { wch: 20 }  // PENDAMPING
             ];
 
+            // Konfigurasi Halaman Excel Siap Cetak (Paper Folio / F4 Landscape)
             ws['!pageSetup'] = {
-                paperSize: 14,
+                paperSize: 14, // Ukuran Folio / F4
                 orientation: 'landscape',
                 fitToWidth: 1,
                 fitToHeight: 0
             };
+
+            ws['!printOptions'] = {
+                horizontalCentered: true
+            };
+
+            ws['!margins'] = { left: 0.3, right: 0.3, top: 0.4, bottom: 0.4, header: 0.2, footer: 0.2 };
 
             return ws;
         }
@@ -729,7 +784,7 @@
 
         function downloadSinglePDF(index) {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]); 
+            const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]); // Ukuran F4 / Folio Landscape
             const data = processedDatasets[index];
             drawPDFContent(doc, data);
             doc.save(data.schoolName + "_" + data.monthName + "_" + data.year + ".pdf");
@@ -745,7 +800,7 @@
 
         function downloadAllMergedPDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]); 
+            const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]); // Ukuran F4 / Folio Landscape
             processedDatasets.forEach(function(data, i) {
                 if (i > 0) doc.addPage();
                 drawPDFContent(doc, data);
