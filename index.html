@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
-    <!-- Library xlsx-js-style untuk mendukung Border & Styling Excel -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -43,13 +42,11 @@
                 </div>
                 
                 <div class="flex items-center gap-2">
-                    <!-- Tombol QRIS Donasi -->
                     <button onclick="openQrisModal()" class="px-3 py-2 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-600 hover:to-yellow-600 text-white font-bold rounded-xl text-xs uppercase tracking-wider shadow-md flex items-center gap-2 transition-all transform hover:scale-105">
                         <i data-lucide="qr-code" class="w-4 h-4"></i>
                         <span class="hidden md:inline">Donasi QRIS</span>
                     </button>
 
-                    <!-- Tombol Admin (Gembok) -->
                     <button onclick="openAdminAuthModal()" class="p-2.5 bg-indigo-900 hover:bg-black text-white rounded-xl shadow-md transition-all flex items-center justify-center" title="Pengaturan Admin">
                         <i data-lucide="lock" class="w-4 h-4 text-amber-400"></i>
                     </button>
@@ -60,25 +57,25 @@
 
     <main class="max-w-full mx-auto px-4 md:px-6 py-6 md:py-8">
         
-        <!-- COUNTER STATISTIK / TOTAL FILE -->
-        <div id="statsContainer" class="hidden mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- COUNTER STATISTIK AKUMULASI GLOBAL (SEMUA PENGGUNA) -->
+        <div id="statsContainer" class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="glass-panel p-4 rounded-2xl flex items-center gap-4 border-l-4 border-indigo-600">
                 <div class="p-3 bg-indigo-100 text-indigo-700 rounded-xl">
-                    <i data-lucide="files" class="w-6 h-6"></i>
+                    <i data-lucide="globe" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Laporan / Sekolah</p>
-                    <h4 id="statTotalLaporan" class="text-2xl font-black text-indigo-950">0</h4>
+                    <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Laporan / Sekolah (Semua Pengguna)</p>
+                    <h4 id="statTotalLaporan" class="text-2xl font-black text-indigo-950">Loading...</h4>
                 </div>
             </div>
             
             <div class="glass-panel p-4 rounded-2xl flex items-center gap-4 border-l-4 border-purple-600">
                 <div class="p-3 bg-purple-100 text-purple-700 rounded-xl">
-                    <i data-lucide="users" class="w-6 h-6"></i>
+                    <i data-lucide="database" class="w-6 h-6"></i>
                 </div>
                 <div>
-                    <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Baris Data Dirapikan</p>
-                    <h4 id="statTotalBaris" class="text-2xl font-black text-purple-950">0</h4>
+                    <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Total Baris Terproses (Semua Pengguna)</p>
+                    <h4 id="statTotalBaris" class="text-2xl font-black text-purple-950">Loading...</h4>
                 </div>
             </div>
         </div>
@@ -107,7 +104,7 @@
                     <ul class="space-y-2 text-[11px] md:text-xs text-gray-800 font-medium leading-relaxed">
                         <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Judul Tengah & Format F4 Landscape.</span></li>
                         <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Hasil Excel Presisi 100% Sama Sesuai PDF.</span></li>
-                        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Excel Auto Page-Setup F4 Ready-to-Print.</span></li>
+                        <li class="flex items-start gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i><span>Excel Auto Page-Setup Landscape 1 Page Wide.</span></li>
                     </ul>
                 </div>
             </div>
@@ -141,7 +138,7 @@
         <div id="resultContainer" class="space-y-12"></div>
     </main>
 
-    <!-- BANNER DONASI SUKARELA DI FOOTER -->
+    <!-- FOOTER DONASI -->
     <footer class="max-w-full mx-auto px-4 md:px-6 my-8">
         <div class="glass-panel rounded-2xl p-6 text-center border border-amber-200 bg-amber-50/40">
             <div class="flex flex-col items-center justify-center gap-3">
@@ -159,7 +156,7 @@
         </div>
     </footer>
 
-    <!-- MODAL QRIS DONASI -->
+    <!-- MODAL QRIS -->
     <div id="qrisModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl p-6 max-w-sm w-full text-center shadow-2xl transform transition-all border border-amber-200">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
@@ -185,7 +182,7 @@
         </div>
     </div>
 
-    <!-- MODAL AUTH ADMIN (PIN LOCK) -->
+    <!-- MODAL AUTH ADMIN -->
     <div id="adminAuthModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl p-6 max-w-xs w-full text-center shadow-2xl border border-indigo-100">
             <div class="w-12 h-12 bg-indigo-100 text-indigo-800 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -203,7 +200,7 @@
         </div>
     </div>
 
-    <!-- MODAL PENGATURAN ADMIN (SETTING QRIS & TEXT) -->
+    <!-- MODAL PENGATURAN ADMIN -->
     <div id="adminSettingsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-indigo-100">
             <div class="flex justify-between items-center mb-4 border-b pb-3">
@@ -260,7 +257,27 @@
 
         window.addEventListener('DOMContentLoaded', function() {
             loadQrisSettings();
+            fetchGlobalStats(); // Otomatis Ambil Akumulasi Data dari Seluruh Pengguna
         });
+
+        // AMBIL STATISTIK AKUMULASI DARI SERVER (GOOGLE SHEETS)
+        async function fetchGlobalStats() {
+            if (!GAS_WEBAPP_URL) return;
+            try {
+                const response = await fetch(GAS_WEBAPP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: "getGlobalStats" })
+                });
+                const res = await response.json();
+                if (res.success) {
+                    document.getElementById('statTotalLaporan').innerText = res.totalLaporan;
+                    document.getElementById('statTotalBaris').innerText = res.totalBaris;
+                }
+            } catch (err) {
+                console.error("Gagal mengambil statistik akumulasi global:", err);
+            }
+        }
 
         function loadQrisSettings() {
             const savedText = localStorage.getItem('qris_custom_text') || DEFAULT_DONATION_TEXT;
@@ -304,8 +321,6 @@
             processBtn.innerHTML = '<i data-lucide="loader-2" class="w-5 h-5 animate-spin"></i> Memproses...';
             lucide.createIcons();
 
-            let totalRowsCount = 0;
-
             for (let i = 0; i < files.length; i++) {
                 let text = "";
                 const file = files[i];
@@ -324,7 +339,6 @@
                 if (parseResult && parseResult.monthsData.length > 0) {
                     parseResult.monthsData.forEach(function(monthData) {
                         processedDatasets.push(monthData);
-                        totalRowsCount += monthData.data.length;
                         renderTable(monthData, processedDatasets.length - 1);
                     });
                     rawDataForDB.push(parseResult.rawDatabaseData);
@@ -332,17 +346,13 @@
             }
 
             if (rawDataForDB.length > 0) {
-                saveToSheet(rawDataForDB);
+                await saveToSheet(rawDataForDB);
             }
-
-            document.getElementById('statTotalLaporan').innerText = processedDatasets.length;
-            document.getElementById('statTotalBaris').innerText = totalRowsCount;
-            statsContainer.classList.remove('hidden');
 
             processBtn.disabled = false;
             processBtn.innerHTML = '<i data-lucide="cpu" class="w-5 h-5"></i> Proses Laporan Otomatis';
             globalActionContainer.classList.remove('hidden');
-            showToast("Laporan Berhasil Disusun & Dipisah!");
+            showToast("Laporan Berhasil Disusun!");
             lucide.createIcons();
         });
 
@@ -482,7 +492,7 @@
             lucide.createIcons();
         }
 
-        // GENERATE PDF LANDSCAPE F4 (330.2mm x 215.9mm)
+        // GENERATE PDF LANDSCAPE F4
         function drawPDFContent(doc, data) {
             const pageW = doc.internal.pageSize.getWidth();
             
@@ -563,7 +573,7 @@
         }
 
         // =========================================================================
-        // GENERATE EXCEL PERBAIKAN: PRESISI F4 LANDSCAPE & FIT 1 PAGE WIDE 100% SAMA PDF
+        // KUNCI PERBAIKAN EXCEL: SHIFT TO XML PAGE SETUP (LANDSCAPE, F4, FIT 1 PAGE WIDE)
         // =========================================================================
         function createStyledExcelSheet(data) {
             const borderThin = {
@@ -609,12 +619,12 @@
             r2[0] = { v: "PERIODE: " + data.monthName + " " + data.year, s: styleTitleSub };
             wsData.push(r2);
 
-            wsData.push([]); // Baris Kosong
+            wsData.push([]); 
             
             // Baris 4 & 5: Info Sekolah
             wsData.push([{ v: "NPSN          : " + data.npsn, s: styleInfo }]);
             wsData.push([{ v: "NAMA SEKOLAH : " + data.schoolName, s: styleInfo }]);
-            wsData.push([]); // Baris Kosong
+            wsData.push([]); 
 
             // Baris 7: Header Utama
             wsData.push([
@@ -654,7 +664,7 @@
                 { v: "", s: styleHeaderCell }
             ]);
 
-            // Baris 9: Sub-Header Absensi (A, I, S, JML, %)
+            // Baris 9: Sub-Header Absensi
             wsData.push([
                 { v: "", s: styleHeaderCell },
                 { v: "", s: styleHeaderCell },
@@ -673,7 +683,7 @@
                 { v: "", s: styleHeaderCell }
             ]);
 
-            // Baris Data Santri / Siswa
+            // Baris Data
             data.data.forEach(function(row) {
                 let rowCells = [];
                 for (let cIdx = 0; cIdx < 15; cIdx++) {
@@ -707,54 +717,60 @@
 
             const ws = XLSX.utils.aoa_to_sheet(wsData);
 
-            // MERGE SEL PRESISI 100% SAMA PDF
+            // MERGE SEL
             ws['!merges'] = [
-                { s: { r: 0, c: 0 }, e: { r: 0, c: 14 } }, // Judul Utama Center
-                { s: { r: 1, c: 0 }, e: { r: 1, c: 14 } }, // Periode Center
-                { s: { r: 6, c: 0 }, e: { r: 8, c: 0 } },  // NO
-                { s: { r: 6, c: 1 }, e: { r: 8, c: 1 } },  // NIK PENGURUS
-                { s: { r: 6, c: 2 }, e: { r: 8, c: 2 } },  // NAMA PENGURUS
-                { s: { r: 6, c: 3 }, e: { r: 8, c: 3 } },  // NIK SISWA
-                { s: { r: 6, c: 4 }, e: { r: 8, c: 4 } },  // NISN
-                { s: { r: 6, c: 5 }, e: { r: 8, c: 5 } },  // NAMA SISWA
-                { s: { r: 6, c: 6 }, e: { r: 8, c: 6 } },  // BENTUK
-                { s: { r: 6, c: 7 }, e: { r: 8, c: 7 } },  // TINGKAT
-                { s: { r: 6, c: 8 }, e: { r: 6, c: 12 } }, // BULAN
-                { s: { r: 7, c: 8 }, e: { r: 7, c: 12 } }, // HARI EFEKTIF
-                { s: { r: 6, c: 13 }, e: { r: 8, c: 13 } },// KET
-                { s: { r: 6, c: 14 }, e: { r: 8, c: 14 } },// PENDAMPING
+                { s: { r: 0, c: 0 }, e: { r: 0, c: 14 } }, 
+                { s: { r: 1, c: 0 }, e: { r: 1, c: 14 } }, 
+                { s: { r: 6, c: 0 }, e: { r: 8, c: 0 } },  
+                { s: { r: 6, c: 1 }, e: { r: 8, c: 1 } },  
+                { s: { r: 6, c: 2 }, e: { r: 8, c: 2 } },  
+                { s: { r: 6, c: 3 }, e: { r: 8, c: 3 } },  
+                { s: { r: 6, c: 4 }, e: { r: 8, c: 4 } },  
+                { s: { r: 6, c: 5 }, e: { r: 8, c: 5 } },  
+                { s: { r: 6, c: 6 }, e: { r: 8, c: 6 } },  
+                { s: { r: 6, c: 7 }, e: { r: 8, c: 7 } },  
+                { s: { r: 6, c: 8 }, e: { r: 6, c: 12 } }, 
+                { s: { r: 7, c: 8 }, e: { r: 7, c: 12 } }, 
+                { s: { r: 6, c: 13 }, e: { r: 8, c: 13 } },
+                { s: { r: 6, c: 14 }, e: { r: 8, c: 14 } },
                 { s: { r: wsData.length - 5, c: 11 }, e: { r: wsData.length - 5, c: 14 } },
                 { s: { r: wsData.length - 4, c: 11 }, e: { r: wsData.length - 4, c: 14 } },
                 { s: { r: wsData.length - 1, c: 11 }, e: { r: wsData.length - 1, c: 14 } }
             ];
 
-            // LEBAR KOLOM OPTIMAL SUPAYA TULISAN TERBACA JELAS & FIT KE F4 LANDSCAPE
+            // LEBAR KOLOM EXCEL
             ws['!cols'] = [
-                { wch: 4.5 }, // NO
-                { wch: 17.5 },// NIK PENGURUS
-                { wch: 21 },  // NAMA PENGURUS
-                { wch: 17.5 },// NIK SISWA
-                { wch: 13 },  // NISN
-                { wch: 21 },  // NAMA SISWA
-                { wch: 8.5 }, // BENTUK
-                { wch: 8.5 }, // TINGKAT
-                { wch: 3.5 }, // A
-                { wch: 3.5 }, // I
-                { wch: 3.5 }, // S
-                { wch: 4.5 }, // JML
-                { wch: 5.5 }, // %
-                { wch: 8.5 }, // KET
-                { wch: 18 }   // PENDAMPING
+                { wch: 4.5 }, 
+                { wch: 17.5 },
+                { wch: 21 },  
+                { wch: 17.5 },
+                { wch: 13 },  
+                { wch: 21 },  
+                { wch: 8.5 }, 
+                { wch: 8.5 }, 
+                { wch: 3.5 }, 
+                { wch: 3.5 }, 
+                { wch: 3.5 }, 
+                { wch: 4.5 }, 
+                { wch: 5.5 }, 
+                { wch: 8.5 }, 
+                { wch: 18 }   
             ];
 
-            // KUNCI UTAMA: WAKTU DI-PRINT / DIPREVIEW DI EXCEL
-            // OTOMATIS FIT 1 PAGE WIDE, FORMAT LANDSCAPE, DAN KERTAS F4/FOLIO
+            // =========================================================
+            // BLUEPRINT UTAMA: PAKSA EXCEL UNTUK LOCK LANDSCAPE DENGAN FIT-TO-PAGE
+            // =========================================================
+            ws['!sheetPr'] = {
+                pageSetUpPr: {
+                    fitToPage: true // WAJIB ADA agar Excel tidak mengabaikan PageSetup!
+                }
+            };
+
             ws['!pageSetup'] = {
-                paperSize: 14,          // Kertas F4 / Folio
-                orientation: 'landscape',// Orientasi Landscape
-                fitToWidth: 1,           // Paksa Muat dalam 1 Halaman Lebar
-                fitToHeight: 0,          // Tinggi Mengikuti Baris Data (Autofit)
-                fitToPage: true          // KUNCI FIT TO PAGE DI EXCEL
+                paperSize: 14,            // 14 = Ukuran Kertas F4 / Folio
+                orientation: 'landscape', // Kunci Landscape
+                fitToWidth: 1,            // Lebar pas 1 halaman
+                fitToHeight: 0            // Tinggi fleksibel sesuai data
             };
 
             ws['!printOptions'] = {
@@ -762,7 +778,7 @@
                 verticalCentered: false
             };
 
-            ws['!margins'] = { left: 0.25, right: 0.25, top: 0.4, bottom: 0.4, header: 0.1, footer: 0.1 };
+            ws['!margins'] = { left: 0.2, right: 0.2, top: 0.3, bottom: 0.3, header: 0.1, footer: 0.1 };
 
             return ws;
         }
@@ -795,7 +811,7 @@
 
         function downloadSinglePDF(index) {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]); // Ukuran F4 / Folio Landscape
+            const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]); // F4 Landscape
             const data = processedDatasets[index];
             drawPDFContent(doc, data);
             doc.save(data.schoolName + "_" + data.monthName + "_" + data.year + ".pdf");
@@ -811,7 +827,7 @@
 
         function downloadAllMergedPDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]); // Ukuran F4 / Folio Landscape
+            const doc = new jsPDF('landscape', 'mm', [215.9, 330.2]); // F4 Landscape
             processedDatasets.forEach(function(data, i) {
                 if (i > 0) doc.addPage();
                 drawPDFContent(doc, data);
@@ -819,19 +835,23 @@
             doc.save("Gabungan_Laporan_Verifikasi.pdf");
         }
 
-        function saveToSheet(rawDataArray) {
+        async function saveToSheet(rawDataArray) {
             if (!GAS_WEBAPP_URL) return;
             
-            fetch(GAS_WEBAPP_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ data: rawDataArray })
-            })
-            .then(function(res) { return res.json(); })
-            .then(function(res) {
-                if (res.success) showToast("Database Google Sheet berhasil diperbarui!");
-            })
-            .catch(function(err) { console.error("GAS Error:", err); });
+            try {
+                const response = await fetch(GAS_WEBAPP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ data: rawDataArray })
+                });
+                const res = await response.json();
+                if (res.success) {
+                    showToast("Database Google Sheet berhasil diperbarui!");
+                    fetchGlobalStats(); // Perbarui counter akumulasi global
+                }
+            } catch (err) {
+                console.error("GAS Error:", err);
+            }
         }
 
         // FUNGSI MODAL QRIS & ADMIN
@@ -852,7 +872,6 @@
             document.getElementById('adminAuthModal').classList.add('hidden');
         }
 
-        // VERIFIKASI ADMIN AMAN VIA SERVER-SIDE (GAS)
         async function verifyAdminPin() {
             const inputPin = document.getElementById('adminPinInput').value.trim();
             if (!inputPin) {
