@@ -249,7 +249,6 @@
         let rawDataForDB = []; 
 
         const DEFAULT_DONATION_TEXT = "Aplikasi E-Auto Form Fasdik ini disediakan 100% gratis tanpa biaya. Bagi Anda yang merasa terbantu dan ingin memberikan apresiasi atau donasi sukarela untuk keberlanjutan pengembangan aplikasi ini, silakan scan kode QRIS di bawah ini. Terima kasih atas dukungannya!";
-        const ADMIN_PIN = "123456";
 
         const fileInput = document.getElementById('fileInput');
         const fileList = document.getElementById('fileList');
@@ -841,13 +840,33 @@
             document.getElementById('adminAuthModal').classList.add('hidden');
         }
 
-        function verifyAdminPin() {
-            const pin = document.getElementById('adminPinInput').value;
-            if (pin === ADMIN_PIN) {
-                closeAdminAuthModal();
-                openAdminSettingsModal();
-            } else {
-                showToast("PIN Admin Salah!");
+        // VERIFIKASI ADMIN AMAN VIA SERVER-SIDE (GAS)
+        async function verifyAdminPin() {
+            const inputPin = document.getElementById('adminPinInput').value.trim();
+            if (!inputPin) {
+                showToast("Masukkan PIN terlebih dahulu!");
+                return;
+            }
+
+            showToast("Memeriksa PIN...");
+            
+            try {
+                const response = await fetch(GAS_WEBAPP_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action: "verifyAdmin", password: inputPin })
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    closeAdminAuthModal();
+                    openAdminSettingsModal();
+                    showToast("Akses Admin Diterima!");
+                } else {
+                    showToast(result.message || "PIN Admin Salah!");
+                }
+            } catch (err) {
+                showToast("Gagal terhubung ke server untuk verifikasi!");
             }
         }
 
